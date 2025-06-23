@@ -15,14 +15,9 @@ import {
   Zap,
   Bot
 } from 'lucide-react';
-import type { Lead } from './types';
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const handleLeadSubmission = async (leadData: Partial<Lead>) => {
-    console.log('New lead captured:', leadData);
-  };
 
   return (
     <Router>
@@ -34,7 +29,7 @@ function App() {
         
         <main>
           <Routes>
-            <Route path="/" element={<MinimalistCEOFunnel onLeadSubmit={handleLeadSubmission} />} />
+            <Route path="/" element={<MinimalistCEOFunnel />} />
           </Routes>
         </main>
 
@@ -45,11 +40,7 @@ function App() {
 }
 
 // Minimalist CEO-Focused Funnel Page
-interface MinimalistCEOFunnelProps {
-  onLeadSubmit: (lead: Partial<Lead>) => void;
-}
-
-const MinimalistCEOFunnel: React.FC<MinimalistCEOFunnelProps> = ({ onLeadSubmit }) => {
+const MinimalistCEOFunnel: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
