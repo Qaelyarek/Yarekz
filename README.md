@@ -42,8 +42,8 @@ Update your `.env` file with VAPI credentials:
 
 ```env
 # Required for VAPI functionality
-VITE_VAPI_PUBLIC_KEY=your_vapi_public_key_here
-VITE_VAPI_ASSISTANT_ID=your_vapi_assistant_id_here
+VITE_VAPI_PUBLIC_KEY=59daf631-d47d-4697-8ad5-ba84ec36eaa7
+VITE_VAPI_ASSISTANT_ID=d7f2e641-d690-412d-b8b0-db973ff0d937
 
 # Optional VAPI settings
 VITE_VAPI_API_KEY=your_vapi_api_key_here
