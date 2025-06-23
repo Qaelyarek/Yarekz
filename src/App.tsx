@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { DollarSign, TrendingUp, Target, Star, Clock, Shield, Users } from 'lucide-react';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import VAPIDemo from './components/VAPIDemo';
@@ -115,12 +116,6 @@ const HomePage: React.FC = () => {
 
 // Minimalist CEO-Focused Funnel Page (keeping existing functionality)
 const MinimalistCEOFunnel: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
   const handleAIConnect = () => {
     console.log('✅ AI Phone Caller connection initiated');
   };
