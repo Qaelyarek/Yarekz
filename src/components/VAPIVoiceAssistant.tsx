@@ -3,8 +3,8 @@ import { Phone, PhoneOff, Mic, MicOff } from 'lucide-react';
 
 // VAPI Configuration - Replace with your actual credentials
 const VAPI_CONFIG = {
-  publicKey: 'YOUR_PUBLIC_KEY',
-  assistantId: 'YOUR_AGENT_ID'
+  publicKey: '59daf631-d47d-4697-8ad5-ba84ec36eaa7',
+  assistantId: 'd7f2e641-d690-412d-b8b0-db973ff0d937'
 };
 
 declare global {
