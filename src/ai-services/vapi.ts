@@ -1,23 +1,41 @@
 // VAPI voice integration service
 import { env, validateVAPIConfig } from '../config/environment';
 
-// Using the specified agent ID
-const VAPI_ASSISTANT_ID = 'd7f2e641-d690-412d-b8b0-db973ff0d937';
-
 declare global {
   interface Window {
     Vapi: any;
   }
 }
 
+export interface VAPICallResult {
+  success: boolean;
+  message: string;
+  error?: any;
+}
+
+export interface VAPIStatus {
+  initialized: boolean;
+  sdkLoaded: boolean;
+  configValid: boolean;
+  connected: boolean;
+  assistantId: string;
+  publicKeyHash: string;
+}
+
 class VAPIService {
   private vapi: any = null;
+  private assistantId: string;
   private publicKey: string;
   private isInitialized: boolean = false;
+  private isConnected: boolean = false;
   private initializationPromise: Promise<void> | null = null;
+  private eventListeners: Map<string, Function[]> = new Map();
 
   constructor() {
+    this.assistantId = env.vapiAssistantId;
     this.publicKey = env.vapiPublicKey;
+    
+    // Initialize VAPI when service is created
     this.initializeVapi();
   }
 
@@ -27,46 +45,52 @@ class VAPIService {
     }
 
     this.initializationPromise = new Promise((resolve) => {
-      // Wait for DOM to load and VAPI SDK to be available
       const checkAndInit = () => {
+        // Check if we're in browser environment
         if (typeof window === 'undefined') {
-          console.warn('Not in browser environment');
+          console.warn('⚠️ Not in browser environment - VAPI initialization skipped');
           resolve();
           return;
         }
 
+        // Check if VAPI SDK is loaded
         if (!window.Vapi) {
-          console.warn('VAPI SDK not loaded yet, retrying...');
+          console.log('⏳ Waiting for VAPI SDK to load...');
           setTimeout(checkAndInit, 100);
           return;
         }
 
         // Validate configuration
         if (!validateVAPIConfig()) {
-          console.error('VAPI configuration invalid');
+          console.error('❌ VAPI configuration validation failed');
           resolve();
           return;
         }
 
         try {
-          console.log('Initializing VAPI with public key:', this.publicKey.substring(0, 8) + '...');
+          console.log('🚀 Initializing VAPI with configuration:');
+          console.log(`  - Assistant ID: ${this.assistantId}`);
+          console.log(`  - Public Key: ${this.publicKey.substring(0, 8)}...`);
+          
           this.vapi = new window.Vapi(this.publicKey);
           this.isInitialized = true;
-          console.log('✅ VAPI initialized successfully');
           
           // Set up event listeners
           this.setupEventListeners();
+          
+          console.log('✅ VAPI initialized successfully');
           resolve();
         } catch (error) {
           console.error('❌ Failed to initialize VAPI:', error);
+          this.handleInitializationError(error);
           resolve();
         }
       };
 
-      // Start checking immediately, then fallback to DOM ready
+      // Start checking immediately
       checkAndInit();
       
-      // Also try when DOM is ready
+      // Also set up DOM ready fallback
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', checkAndInit);
       }
@@ -75,81 +99,164 @@ class VAPIService {
     return this.initializationPromise;
   }
 
+  private handleInitializationError(error: any): void {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('VAPI Initialization Error Details:', {
+      error: errorMessage,
+      assistantIdPresent: !!this.assistantId,
+      publicKeyPresent: !!this.publicKey,
+      sdkLoaded: !!window.Vapi,
+    });
+  }
+
   private setupEventListeners(): void {
     if (!this.vapi) return;
 
+    // Call lifecycle events
     this.vapi.on('call-start', () => {
       console.log('📞 VAPI call started');
+      this.isConnected = true;
+      this.emitEvent('call-start');
     });
 
     this.vapi.on('call-end', () => {
       console.log('📞 VAPI call ended');
+      this.isConnected = false;
+      this.emitEvent('call-end');
     });
 
+    // Speech events
     this.vapi.on('speech-start', () => {
       console.log('🎤 User started speaking');
+      this.emitEvent('speech-start');
     });
 
     this.vapi.on('speech-end', () => {
       console.log('🎤 User stopped speaking');
+      this.emitEvent('speech-end');
     });
 
+    // Message events
     this.vapi.on('message', (message: any) => {
-      console.log('💬 VAPI message received:', message);
+      console.log('💬 VAPI message:', message);
+      this.emitEvent('message', message);
     });
 
+    // Error events
     this.vapi.on('error', (error: any) => {
       console.error('❌ VAPI error:', error);
+      this.emitEvent('error', error);
     });
 
+    // Volume events
     this.vapi.on('volume-level', (volume: number) => {
-      // Handle volume level for UI feedback
-      console.log('🔊 Volume level:', volume);
+      this.emitEvent('volume-level', volume);
+    });
+
+    console.log('🎧 VAPI event listeners configured');
+  }
+
+  // Event emitter functionality
+  private emitEvent(eventName: string, data?: any): void {
+    const listeners = this.eventListeners.get(eventName) || [];
+    listeners.forEach(listener => {
+      try {
+        listener(data);
+      } catch (error) {
+        console.error(`Error in event listener for ${eventName}:`, error);
+      }
     });
   }
 
-  async startCall(phoneNumber?: string): Promise<{ success: boolean; message: string }> {
-    // Ensure VAPI is initialized
-    await this.initializeVapi();
-
-    if (!this.isInitialized || !this.vapi) {
-      return {
-        success: false,
-        message: 'VAPI not initialized. Please check your configuration and ensure the VAPI SDK is loaded.'
-      };
+  public on(eventName: string, callback: Function): void {
+    if (!this.eventListeners.has(eventName)) {
+      this.eventListeners.set(eventName, []);
     }
+    this.eventListeners.get(eventName)!.push(callback);
+  }
 
+  public off(eventName: string, callback: Function): void {
+    const listeners = this.eventListeners.get(eventName);
+    if (listeners) {
+      const index = listeners.indexOf(callback);
+      if (index > -1) {
+        listeners.splice(index, 1);
+      }
+    }
+  }
+
+  async startCall(phoneNumber?: string): Promise<VAPICallResult> {
     try {
-      console.log('🚀 Starting VAPI call with assistant:', VAPI_ASSISTANT_ID);
+      // Ensure VAPI is initialized
+      await this.initializeVapi();
+
+      if (!this.isInitialized || !this.vapi) {
+        return {
+          success: false,
+          message: 'VAPI not initialized. Please check your configuration and ensure the VAPI SDK is loaded.',
+        };
+      }
+
+      // Validate configuration before starting call
+      if (!validateVAPIConfig()) {
+        return {
+          success: false,
+          message: 'Invalid VAPI configuration. Please check your environment variables.',
+        };
+      }
+
+      console.log('🚀 Starting VAPI call with configuration:');
+      console.log(`  - Assistant ID: ${this.assistantId}`);
+      console.log(`  - Phone Number: ${phoneNumber || 'Web call (microphone)'}`);
       
-      const callConfig = {
-        assistantId: VAPI_ASSISTANT_ID,
-        ...(phoneNumber && { customer: { number: phoneNumber } })
+      const callConfig: any = {
+        assistantId: this.assistantId,
       };
+
+      // Add phone number for outbound calls if provided
+      if (phoneNumber) {
+        callConfig.customer = { number: phoneNumber };
+      }
 
       await this.vapi.start(callConfig);
       
       return {
         success: true,
-        message: 'Call started successfully'
+        message: 'Call started successfully',
       };
     } catch (error) {
       console.error('❌ Failed to start VAPI call:', error);
       return {
         success: false,
-        message: `Failed to start call: ${error instanceof Error ? error.message : 'Unknown error'}`
+        message: `Failed to start call: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        error,
       };
     }
   }
 
-  async endCall(): Promise<void> {
-    if (!this.vapi) return;
-
+  async endCall(): Promise<VAPICallResult> {
     try {
+      if (!this.vapi) {
+        return {
+          success: false,
+          message: 'VAPI not initialized',
+        };
+      }
+
       await this.vapi.stop();
       console.log('📞 VAPI call ended successfully');
+      
+      return {
+        success: true,
+        message: 'Call ended successfully',
+      };
     } catch (error) {
       console.error('❌ Failed to end VAPI call:', error);
+      return {
+        success: false,
+        message: `Failed to end call: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        error,
+      };
     }
   }
 
@@ -160,27 +267,32 @@ class VAPIService {
   toggleMute(): void {
     if (!this.vapi) return;
     
-    if (this.isMuted()) {
-      this.vapi.unmute();
-      console.log('🔊 VAPI unmuted');
-    } else {
-      this.vapi.mute();
-      console.log('🔇 VAPI muted');
+    try {
+      if (this.isMuted()) {
+        this.vapi.unmute();
+        console.log('🔊 VAPI unmuted');
+      } else {
+        this.vapi.mute();
+        console.log('🔇 VAPI muted');
+      }
+    } catch (error) {
+      console.error('❌ Failed to toggle mute:', error);
     }
   }
 
   isCallActive(): boolean {
-    return this.vapi?.isCallActive() || false;
+    return this.isConnected && this.vapi?.isCallActive();
   }
 
   // Get the assistant ID being used
   getAssistantId(): string {
-    return VAPI_ASSISTANT_ID;
+    return this.assistantId || 'Not configured';
   }
 
-  // Get the public key being used (for debugging)
-  getPublicKey(): string {
-    return this.publicKey.substring(0, 8) + '...';
+  // Get the public key being used (for debugging - masked for security)
+  getPublicKeyHash(): string {
+    if (!this.publicKey) return 'Not configured';
+    return this.publicKey.substring(0, 8) + '...' + this.publicKey.substring(-4);
   }
 
   // Check if VAPI is properly initialized
@@ -189,17 +301,48 @@ class VAPIService {
   }
 
   // Get current status for debugging
-  getStatus(): {
-    initialized: boolean;
-    sdkLoaded: boolean;
-    publicKeySet: boolean;
-    assistantId: string;
-  } {
+  getStatus(): VAPIStatus {
     return {
       initialized: this.isInitialized,
       sdkLoaded: typeof window !== 'undefined' && !!window.Vapi,
-      publicKeySet: !!this.publicKey && this.publicKey !== 'your-vapi-public-key',
-      assistantId: VAPI_ASSISTANT_ID,
+      configValid: validateVAPIConfig(),
+      connected: this.isConnected,
+      assistantId: this.getAssistantId(),
+      publicKeyHash: this.getPublicKeyHash(),
+    };
+  }
+
+  // Debug method to test configuration
+  async testConfiguration(): Promise<VAPICallResult> {
+    console.log('🔍 Testing VAPI configuration...');
+    
+    const status = this.getStatus();
+    console.table(status);
+
+    if (!status.sdkLoaded) {
+      return {
+        success: false,
+        message: 'VAPI SDK not loaded. Check if the script tag is included in your HTML.',
+      };
+    }
+
+    if (!status.configValid) {
+      return {
+        success: false,
+        message: 'VAPI configuration is invalid. Check your environment variables.',
+      };
+    }
+
+    if (!status.initialized) {
+      return {
+        success: false,
+        message: 'VAPI not initialized. Check the browser console for errors.',
+      };
+    }
+
+    return {
+      success: true,
+      message: 'VAPI configuration is valid and ready to use.',
     };
   }
 }
@@ -210,6 +353,7 @@ const vapiService = new VAPIService();
 // Make it available globally for debugging
 if (typeof window !== 'undefined') {
   (window as any).VAPIService = vapiService;
+  (window as any).testVAPI = () => vapiService.testConfiguration();
 }
 
 export default vapiService;

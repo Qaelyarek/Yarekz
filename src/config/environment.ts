@@ -51,9 +51,9 @@ export const env: EnvironmentConfig = {
   azureSpeechKey: getEnvVar('VITE_AZURE_SPEECH_KEY'),
   azureSpeechRegion: getEnvVar('VITE_AZURE_SPEECH_REGION'),
   
-  // VAPI Voice Integration - Using the provided credentials
-  vapiAssistantId: getEnvVar('VITE_VAPI_ASSISTANT_ID', 'd7f2e641-d690-412d-b8b0-db973ff0d937'),
-  vapiPublicKey: getEnvVar('VITE_VAPI_PUBLIC_KEY', '59daf631-d47d-4697-8ad5-ba84ec36eaa7'),
+  // VAPI Voice Integration - Securely from environment variables
+  vapiAssistantId: getEnvVar('VITE_VAPI_ASSISTANT_ID'),
+  vapiPublicKey: getEnvVar('VITE_VAPI_PUBLIC_KEY'),
   
   // Analytics
   googleAnalyticsId: getEnvVar('VITE_GOOGLE_ANALYTICS_ID'),
@@ -76,11 +76,43 @@ export const isDevelopment = env.appEnv === 'development';
 export const isProduction = env.appEnv === 'production';
 export const isStaging = env.appEnv === 'staging';
 
+// VAPI specific validation
+export const validateVAPIConfig = (): boolean => {
+  const assistantId = env.vapiAssistantId;
+  const publicKey = env.vapiPublicKey;
+  
+  if (!assistantId || assistantId === 'your_vapi_assistant_id_here') {
+    console.error('❌ VAPI Assistant ID not configured properly');
+    return false;
+  }
+  
+  if (!publicKey || publicKey === 'your_vapi_public_key_here') {
+    console.error('❌ VAPI Public Key not configured properly');
+    return false;
+  }
+  
+  // Basic format validation
+  if (!assistantId.match(/^[a-f0-9-]{36}$/)) {
+    console.error('❌ VAPI Assistant ID format is invalid');
+    return false;
+  }
+  
+  if (!publicKey.match(/^[a-f0-9-]{36}$/)) {
+    console.error('❌ VAPI Public Key format is invalid');
+    return false;
+  }
+  
+  console.log('✅ VAPI configuration validated successfully');
+  return true;
+};
+
 // Validation helper
 export const validateRequiredEnvVars = () => {
   const requiredForProduction = [
     'VITE_SUPABASE_URL',
     'VITE_SUPABASE_ANON_KEY',
+    'VITE_VAPI_ASSISTANT_ID',
+    'VITE_VAPI_PUBLIC_KEY',
   ];
 
   if (isProduction) {
@@ -89,18 +121,4 @@ export const validateRequiredEnvVars = () => {
       throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
     }
   }
-};
-
-// VAPI specific validation
-export const validateVAPIConfig = () => {
-  const vapiKeys = ['VITE_VAPI_ASSISTANT_ID', 'VITE_VAPI_PUBLIC_KEY'];
-  const missing = vapiKeys.filter(key => !getEnvVar(key));
-  
-  if (missing.length > 0) {
-    console.warn(`VAPI configuration incomplete. Missing: ${missing.join(', ')}`);
-    return false;
-  }
-  
-  console.log('✅ VAPI configuration validated');
-  return true;
 };

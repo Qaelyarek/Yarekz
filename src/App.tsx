@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import AIPhoneCaller from './components/ai/AIPhoneCaller';
+import { validateRequiredEnvVars, isDevelopment } from './config/environment';
 import { 
   TrendingUp, 
   Users, 
@@ -18,6 +19,15 @@ import {
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  useEffect(() => {
+    // Validate environment variables on app startup
+    try {
+      validateRequiredEnvVars();
+    } catch (error) {
+      console.error('Environment validation failed:', error);
+    }
+  }, []);
 
   return (
     <Router>
@@ -48,8 +58,11 @@ const MinimalistCEOFunnel: React.FC = () => {
   }, []);
 
   const handleAIConnect = () => {
-    console.log('Connecting to AI phone caller...');
-    // Here you would integrate with your actual AI phone service
+    console.log('✅ AI Phone Caller connection initiated');
+  };
+
+  const handleAIDisconnect = () => {
+    console.log('📞 AI Phone Caller disconnected');
   };
 
   return (
@@ -96,7 +109,11 @@ const MinimalistCEOFunnel: React.FC = () => {
               </p>
               
               <div className="mb-12">
-                <AIPhoneCaller onConnect={handleAIConnect} />
+                <AIPhoneCaller 
+                  onConnect={handleAIConnect}
+                  onDisconnect={handleAIDisconnect}
+                  debugMode={isDevelopment}
+                />
               </div>
 
               {/* Trust Indicators - Minimalist */}
@@ -257,7 +274,12 @@ const MinimalistCEOFunnel: React.FC = () => {
           </p>
           
           <div className="mb-12">
-            <AIPhoneCaller onConnect={handleAIConnect} />
+            <AIPhoneCaller 
+              onConnect={handleAIConnect}
+              onDisconnect={handleAIDisconnect}
+              showPhoneInput={true}
+              debugMode={isDevelopment}
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">

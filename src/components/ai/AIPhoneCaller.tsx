@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, PhoneCall, Mic, MicOff, PhoneOff } from 'lucide-react';
+import { Phone, PhoneCall, Mic, MicOff, PhoneOff, AlertTriangle, CheckCircle } from 'lucide-react';
 import VoiceAnimator from './VoiceAnimator';
 import VAPIService from '../../ai-services/vapi';
+import type { VAPICallResult } from '../../ai-services/vapi';
 
 interface AIPhoneCallerProps {
   onConnect?: () => void;
+  onDisconnect?: () => void;
   className?: string;
   showPhoneInput?: boolean;
+  debugMode?: boolean;
 }
 
 const AIPhoneCaller: React.FC<AIPhoneCallerProps> = ({ 
   onConnect, 
+  onDisconnect,
   className = "", 
-  showPhoneInput = false 
+  showPhoneInput = false,
+  debugMode = false
 }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -20,7 +25,10 @@ const AIPhoneCaller: React.FC<AIPhoneCallerProps> = ({
   const [callDuration, setCallDuration] = useState(0);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [vapiStatus, setVapiStatus] = useState(VAPIService.getStatus());
+  const [isAISpeaking, setIsAISpeaking] = useState(false);
 
+  // Call duration timer
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isConnected) {
@@ -31,20 +39,64 @@ const AIPhoneCaller: React.FC<AIPhoneCallerProps> = ({
     return () => clearInterval(interval);
   }, [isConnected]);
 
+  // VAPI event listeners
   useEffect(() => {
-    // Check if VAPI is ready
-    const checkVapiReady = () => {
-      if (!VAPIService.isReady() && typeof window !== 'undefined' && window.Vapi) {
-        // VAPI SDK loaded but service not initialized, try again
-        setTimeout(() => {
-          if (!VAPIService.isReady()) {
-            setError('VAPI service initialization failed');
-          }
-        }, 1000);
-      }
+    const handleCallStart = () => {
+      setIsConnected(true);
+      setIsConnecting(false);
+      setCallDuration(0);
+      setError(null);
+      onConnect?.();
     };
 
-    checkVapiReady();
+    const handleCallEnd = () => {
+      setIsConnected(false);
+      setIsConnecting(false);
+      setIsAISpeaking(false);
+      setCallDuration(0);
+      onDisconnect?.();
+    };
+
+    const handleSpeechStart = () => {
+      setIsAISpeaking(true);
+    };
+
+    const handleSpeechEnd = () => {
+      setIsAISpeaking(false);
+    };
+
+    const handleError = (error: any) => {
+      console.error('VAPI Error:', error);
+      setError(`Connection error: ${error.message || 'Unknown error'}`);
+      setIsConnecting(false);
+    };
+
+    // Set up event listeners
+    VAPIService.on('call-start', handleCallStart);
+    VAPIService.on('call-end', handleCallEnd);
+    VAPIService.on('speech-start', handleSpeechStart);
+    VAPIService.on('speech-end', handleSpeechEnd);
+    VAPIService.on('error', handleError);
+
+    return () => {
+      // Clean up event listeners
+      VAPIService.off('call-start', handleCallStart);
+      VAPIService.off('call-end', handleCallEnd);
+      VAPIService.off('speech-start', handleSpeechStart);
+      VAPIService.off('speech-end', handleSpeechEnd);
+      VAPIService.off('error', handleError);
+    };
+  }, [onConnect, onDisconnect]);
+
+  // Check VAPI status periodically
+  useEffect(() => {
+    const checkStatus = () => {
+      setVapiStatus(VAPIService.getStatus());
+    };
+
+    checkStatus();
+    const interval = setInterval(checkStatus, 2000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleConnect = async () => {
@@ -54,29 +106,37 @@ const AIPhoneCaller: React.FC<AIPhoneCallerProps> = ({
     setError(null);
 
     try {
-      const result = await VAPIService.startCall(phoneNumber || undefined);
+      console.log('🔍 Testing VAPI configuration before connecting...');
+      const testResult = await VAPIService.testConfiguration();
       
-      if (result.success) {
-        setIsConnected(true);
-        setCallDuration(0);
-        onConnect?.();
-      } else {
-        setError(result.message);
+      if (!testResult.success) {
+        setError(testResult.message);
+        setIsConnecting(false);
+        return;
       }
+
+      console.log('📞 Attempting to start VAPI call...');
+      const result: VAPICallResult = await VAPIService.startCall(phoneNumber || undefined);
+      
+      if (!result.success) {
+        setError(result.message);
+        setIsConnecting(false);
+      }
+      // Success will be handled by the call-start event
     } catch (error) {
-      setError('Failed to connect to AI agent');
       console.error('Connection error:', error);
-    } finally {
+      setError('Failed to connect to AI agent');
       setIsConnecting(false);
     }
   };
 
   const handleDisconnect = async () => {
     try {
-      await VAPIService.endCall();
-      setIsConnected(false);
-      setCallDuration(0);
-      setError(null);
+      const result = await VAPIService.endCall();
+      if (!result.success) {
+        console.error('Disconnect error:', result.message);
+      }
+      // Success will be handled by the call-end event
     } catch (error) {
       console.error('Disconnect error:', error);
     }
@@ -93,9 +153,37 @@ const AIPhoneCaller: React.FC<AIPhoneCallerProps> = ({
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const getStatusIndicator = () => {
+    if (!vapiStatus.sdkLoaded) {
+      return <AlertTriangle className="w-4 h-4 text-red-500" />;
+    }
+    if (!vapiStatus.configValid) {
+      return <AlertTriangle className="w-4 h-4 text-yellow-500" />;
+    }
+    if (vapiStatus.initialized) {
+      return <CheckCircle className="w-4 h-4 text-green-500" />;
+    }
+    return <AlertTriangle className="w-4 h-4 text-gray-500" />;
+  };
+
   if (!isConnected) {
     return (
       <div className={`${className}`}>
+        {debugMode && (
+          <div className="mb-4 p-3 bg-gray-100 rounded-lg text-sm">
+            <div className="flex items-center space-x-2 mb-2">
+              {getStatusIndicator()}
+              <span className="font-medium">VAPI Status</span>
+            </div>
+            <div className="space-y-1 text-xs text-gray-600">
+              <div>SDK Loaded: {vapiStatus.sdkLoaded ? '✅' : '❌'}</div>
+              <div>Config Valid: {vapiStatus.configValid ? '✅' : '❌'}</div>
+              <div>Initialized: {vapiStatus.initialized ? '✅' : '❌'}</div>
+              <div>Assistant ID: {vapiStatus.assistantId}</div>
+            </div>
+          </div>
+        )}
+
         {showPhoneInput && (
           <div className="mb-4">
             <input
@@ -104,6 +192,7 @@ const AIPhoneCaller: React.FC<AIPhoneCallerProps> = ({
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg text-black placeholder-gray-500 focus:outline-none focus:border-blue-500"
+              disabled={isConnecting}
             />
             <p className="text-xs text-gray-400 mt-1">
               Leave empty to use your device's microphone
@@ -113,14 +202,28 @@ const AIPhoneCaller: React.FC<AIPhoneCallerProps> = ({
         
         {error && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-            {error}
+            <div className="flex items-start space-x-2">
+              <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+              <div>
+                <div className="font-medium">Connection Error</div>
+                <div>{error}</div>
+                {debugMode && (
+                  <button
+                    onClick={() => VAPIService.testConfiguration()}
+                    className="mt-2 text-xs text-blue-600 hover:text-blue-800 underline"
+                  >
+                    Test Configuration
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
         <button
           onClick={handleConnect}
-          disabled={isConnecting}
-          className={`group relative bg-black text-white border-2 border-white px-12 py-6 rounded-2xl font-bold text-xl transition-all duration-300 hover:bg-white hover:text-black transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+          disabled={isConnecting || !vapiStatus.initialized}
+          className={`group relative bg-black text-white border-2 border-white px-12 py-6 rounded-2xl font-bold text-xl transition-all duration-300 hover:bg-white hover:text-black transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${className}`}
         >
           <div className="flex items-center justify-center space-x-4">
             <Phone className={`w-8 h-8 ${isConnecting ? 'animate-pulse' : 'group-hover:animate-pulse'}`} />
@@ -129,13 +232,16 @@ const AIPhoneCaller: React.FC<AIPhoneCallerProps> = ({
             </span>
           </div>
           
-          {/* Subtle tech animation */}
+          {/* Tech animation */}
           <div className="absolute inset-0 rounded-2xl border-2 border-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
         </button>
 
-        <div className="mt-4 text-center text-sm text-gray-500">
-          Agent ID: {VAPIService.getAssistantId()}
-        </div>
+        {debugMode && (
+          <div className="mt-4 text-center text-xs text-gray-500">
+            <div>Agent: {vapiStatus.assistantId}</div>
+            <div>Key: {vapiStatus.publicKeyHash}</div>
+          </div>
+        )}
       </div>
     );
   }
@@ -158,21 +264,23 @@ const AIPhoneCaller: React.FC<AIPhoneCallerProps> = ({
             <PhoneCall className="w-12 h-12 text-black" />
           </div>
           
-          {/* Always show some activity when connected */}
-          <div className="absolute inset-0 border-2 border-white rounded-full animate-ping opacity-75"></div>
-          <div className="absolute inset-0 border-4 border-gray-400 rounded-full animate-pulse opacity-50" style={{ animationDelay: '0.5s' }}></div>
+          {/* Dynamic animation based on AI speaking state */}
+          <div className={`absolute inset-0 border-2 border-white rounded-full ${isAISpeaking ? 'animate-ping' : 'animate-pulse'} opacity-75`}></div>
+          <div className={`absolute inset-0 border-4 border-gray-400 rounded-full ${isAISpeaking ? 'animate-pulse' : 'animate-ping'} opacity-50`} style={{ animationDelay: '0.5s' }}></div>
         </div>
       </div>
 
       {/* Voice Visualizer */}
       <div className="flex justify-center mb-6">
-        <VoiceAnimator isActive={true} className="h-16" />
+        <VoiceAnimator isActive={isAISpeaking} className="h-16" />
       </div>
 
       {/* AI Status */}
       <div className="text-center mb-6">
-        <div className="text-white text-sm font-medium">
-          AI Agent is active and listening...
+        <div className={`text-sm font-medium transition-colors duration-300 ${
+          isAISpeaking ? 'text-white' : 'text-gray-400'
+        }`}>
+          {isAISpeaking ? 'AI is speaking...' : 'Listening...'}
         </div>
         <div className="text-gray-400 text-xs mt-1">
           Speak naturally - the AI will respond
@@ -200,9 +308,13 @@ const AIPhoneCaller: React.FC<AIPhoneCallerProps> = ({
         </button>
       </div>
 
-      <div className="mt-4 text-center text-xs text-gray-400">
-        Using VAPI Agent: {VAPIService.getAssistantId()}
-      </div>
+      {debugMode && (
+        <div className="mt-4 text-center text-xs text-gray-400">
+          <div>Status: {isAISpeaking ? 'Speaking' : 'Listening'}</div>
+          <div>Muted: {isMuted ? 'Yes' : 'No'}</div>
+          <div>Agent: {vapiStatus.assistantId}</div>
+        </div>
+      )}
     </div>
   );
 };

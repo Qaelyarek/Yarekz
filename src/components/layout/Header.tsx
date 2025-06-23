@@ -11,6 +11,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -23,13 +24,22 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
   }, []);
 
   const handleCallAI = async () => {
+    if (isConnecting) return;
+    
+    setIsConnecting(true);
     try {
+      console.log('🎯 Header: Starting VAPI call...');
       const result = await VAPIService.startCall();
+      
       if (!result.success) {
         alert(`Failed to connect: ${result.message}`);
       }
+      // Success will be handled by VAPI events
     } catch (error) {
-      alert('Failed to connect to AI agent');
+      console.error('Header: Failed to connect to AI agent:', error);
+      alert('Failed to connect to AI agent. Please try again.');
+    } finally {
+      setIsConnecting(false);
     }
   };
 
@@ -120,14 +130,15 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
               variant="primary" 
               size="sm"
               onClick={handleCallAI}
+              disabled={isConnecting}
               className={`${
                 !isScrolled && location.pathname === '/' 
                   ? 'bg-white text-black hover:bg-gray-100' 
                   : 'bg-black text-white hover:bg-gray-800'
-              } border-0 shadow-lg`}
+              } border-0 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed`}
             >
-              <Phone className="w-4 h-4 mr-2" />
-              Call AI
+              <Phone className={`w-4 h-4 mr-2 ${isConnecting ? 'animate-pulse' : ''}`} />
+              {isConnecting ? 'Connecting...' : 'Call AI'}
             </Button>
           </div>
 
@@ -168,9 +179,11 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
               <Button 
                 variant="primary" 
                 onClick={handleCallAI}
-                className="w-full mb-3 bg-black text-white"
+                disabled={isConnecting}
+                className="w-full mb-3 bg-black text-white disabled:opacity-50"
               >
-                Call AI Agent
+                <Phone className={`w-4 h-4 mr-2 ${isConnecting ? 'animate-pulse' : ''}`} />
+                {isConnecting ? 'Connecting...' : 'Call AI Agent'}
               </Button>
               
               <div className="flex space-x-3">
@@ -182,9 +195,10 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
                   variant="ghost" 
                   size="sm" 
                   onClick={handleCallAI}
-                  className="flex-1 border-2 border-black text-black"
+                  disabled={isConnecting}
+                  className="flex-1 border-2 border-black text-black disabled:opacity-50"
                 >
-                  <Phone className="w-4 h-4 mr-2" />
+                  <Phone className={`w-4 h-4 mr-2 ${isConnecting ? 'animate-pulse' : ''}`} />
                   Call
                 </Button>
               </div>
