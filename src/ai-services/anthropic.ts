@@ -1,6 +1,6 @@
 // Anthropic integration service
 import { env } from '@config/environment';
-import type { ChatMessage } from '@types';
+import type { ChatMessage } from '@types/index';
 
 class AnthropicService {
   private apiKey: string;

@@ -1,6 +1,6 @@
 // AI-powered lead analysis and scoring
 import OpenAIService from './openai';
-import type { Lead, Interaction } from '@types';
+import type { Lead, Interaction } from '@types/index';
 
 class LeadAnalyzer {
   async analyzeLead(lead: Lead): Promise<{

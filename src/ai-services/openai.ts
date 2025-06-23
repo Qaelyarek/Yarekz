@@ -1,6 +1,6 @@
 // OpenAI integration service
 import { env } from '@config/environment';
-import type { ChatMessage } from '@types';
+import type { ChatMessage } from '@types/index';
 
 class OpenAIService {
   private apiKey: string;

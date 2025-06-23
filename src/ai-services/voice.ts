@@ -1,6 +1,6 @@
 // Voice integration service using ElevenLabs and Azure Speech
 import { env } from '@config/environment';
-import type { VoiceSettings } from '@types';
+import type { VoiceSettings } from '@types/index';
 
 class VoiceService {
   private elevenlabsApiKey: string;
