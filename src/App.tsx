@@ -4,6 +4,8 @@ import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import VAPIDemo from './components/VAPIDemo';
 import AIPhoneHero from './components/hero/AIPhoneHero';
+import EnhancedAIPhoneHero from './components/hero/EnhancedAIPhoneHero';
+import VAPIPhoneInterface from './components/ai/VAPIPhoneInterface';
 import AIPhoneCaller from './components/ai/AIPhoneCaller';
 import { validateRequiredEnvVars, isDevelopment } from './config/environment';
 import { 
@@ -44,6 +46,8 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/vapi-demo" element={<VAPIDemo />} />
             <Route path="/hero-demo" element={<AIPhoneHero />} />
+            <Route path="/enhanced-hero" element={<EnhancedAIPhoneHero />} />
+            <Route path="/interface-demo" element={<InterfaceDemo />} />
           </Routes>
         </main>
 
@@ -53,12 +57,68 @@ function App() {
   );
 }
 
+// Interface Demo Page
+const InterfaceDemo: React.FC = () => {
+  return (
+    <div className="min-h-screen bg-gray-50 py-20">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            VAPI Interface Demo
+          </h1>
+          <p className="text-xl text-gray-600">
+            Test the official VAPI Web SDK integration
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8">
+          <VAPIPhoneInterface
+            showTranscript={true}
+            allowTextInput={true}
+            debugMode={isDevelopment}
+            onCallStart={() => console.log('Interface demo call started')}
+            onCallEnd={() => console.log('Interface demo call ended')}
+          />
+          
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg p-6 border">
+              <h3 className="text-lg font-semibold mb-4">Features Demonstrated:</h3>
+              <ul className="space-y-2 text-gray-600">
+                <li>✅ Official VAPI Web SDK integration</li>
+                <li>✅ Real-time voice conversations</li>
+                <li>✅ Live transcript display</li>
+                <li>✅ Voice visualization</li>
+                <li>✅ Mute/unmute controls</li>
+                <li>✅ Text message support</li>
+                <li>✅ Error handling</li>
+                <li>✅ Debug information</li>
+              </ul>
+            </div>
+
+            <div className="bg-white rounded-lg p-6 border">
+              <h3 className="text-lg font-semibold mb-4">SDK Benefits:</h3>
+              <ul className="space-y-2 text-gray-600">
+                <li>🚀 Latest VAPI Web SDK features</li>
+                <li>🔧 TypeScript support</li>
+                <li>📱 Mobile-responsive design</li>
+                <li>🎯 Production-ready code</li>
+                <li>🔒 Secure credential handling</li>
+                <li>📊 Comprehensive event handling</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Main Homepage Component
 const HomePage: React.FC = () => {
   return (
     <>
-      {/* Hero Section with AI Phone Integration */}
-      <AIPhoneHero />
+      {/* Enhanced Hero Section with Official VAPI Integration */}
+      <EnhancedAIPhoneHero />
       
       {/* Original CEO Funnel Content */}
       <MinimalistCEOFunnel />
@@ -66,7 +126,7 @@ const HomePage: React.FC = () => {
   );
 };
 
-// Minimalist CEO-Focused Funnel Page
+// Minimalist CEO-Focused Funnel Page (keeping existing functionality)
 const MinimalistCEOFunnel: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -182,9 +242,9 @@ const MinimalistCEOFunnel: React.FC = () => {
         </div>
       </section>
 
-      {/* CTA Section - Minimalist */}
+      {/* CTA Section with VAPI Interface */}
       <section className="bg-white text-black py-20 lg:py-32 border-t-4 border-black">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
             Ready to 10X Your Appointments?
           </h2>
@@ -193,12 +253,13 @@ const MinimalistCEOFunnel: React.FC = () => {
             Join 500+ CEOs who've automated their appointment setting with AI.
           </p>
           
-          <div className="mb-12">
-            <AIPhoneCaller 
-              onConnect={handleAIConnect}
-              onDisconnect={handleAIDisconnect}
-              showPhoneInput={true}
-              debugMode={isDevelopment}
+          <div className="mb-12 max-w-md mx-auto">
+            <VAPIPhoneInterface
+              showTranscript={false}
+              allowTextInput={false}
+              debugMode={false}
+              onCallStart={handleAIConnect}
+              onCallEnd={handleAIDisconnect}
             />
           </div>
 
