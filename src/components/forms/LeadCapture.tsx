@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Phone, User, ArrowRight } from 'lucide-react';
+import { Mail, Phone, User, ArrowRight, Shield, Sparkles } from 'lucide-react';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 import { validateEmail, validatePhone, generateId } from '../../utils/index';
@@ -21,7 +21,7 @@ const LeadCapture: React.FC<LeadCaptureProps> = ({
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: '',
+    company: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -49,8 +49,8 @@ const LeadCapture: React.FC<LeadCaptureProps> = ({
       newErrors.email = 'Please enter a valid email address';
     }
 
-    if (formData.phone && !validatePhone(formData.phone)) {
-      newErrors.phone = 'Please enter a valid phone number';
+    if (!formData.company.trim()) {
+      newErrors.company = 'Company name is required';
     }
 
     setErrors(newErrors);
@@ -69,7 +69,6 @@ const LeadCapture: React.FC<LeadCaptureProps> = ({
         id: generateId(),
         name: formData.name.trim(),
         email: formData.email.trim(),
-        phone: formData.phone.trim() || undefined,
         source: 'website',
         status: 'new',
         score: 25, // Initial score for form submission
@@ -77,7 +76,7 @@ const LeadCapture: React.FC<LeadCaptureProps> = ({
           {
             id: generateId(),
             type: 'form',
-            content: `Lead captured via form: ${formData.name} (${formData.email})`,
+            content: `Lead captured via form: ${formData.name} (${formData.email}) from ${formData.company}`,
             timestamp: new Date(),
             aiGenerated: false,
           },
@@ -89,10 +88,10 @@ const LeadCapture: React.FC<LeadCaptureProps> = ({
       await onSubmit(leadData);
       
       // Reset form
-      setFormData({ name: '', email: '', phone: '' });
+      setFormData({ name: '', email: '', company: '' });
       
       // Show success message (you might want to add a success state)
-      alert('Thank you! We\'ll be in touch soon.');
+      alert('Thank you! We\'ll be in touch soon with your personalized AI recommendations.');
       
     } catch (error) {
       console.error('Lead submission error:', error);
@@ -103,15 +102,20 @@ const LeadCapture: React.FC<LeadCaptureProps> = ({
   };
 
   return (
-    <div className={`bg-white rounded-lg shadow-lg p-6 ${className}`}>
-      <div className="text-center mb-6">
+    <div className={`bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/20 ${className}`}>
+      <div className="text-center mb-8">
+        <div className="flex items-center justify-center mb-4">
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+            <Sparkles className="w-6 h-6 text-white" />
+          </div>
+        </div>
         <h3 className="text-2xl font-bold text-gray-900 mb-2">{title}</h3>
         <p className="text-gray-600">{subtitle}</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="relative">
-          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           <Input
             type="text"
             name="name"
@@ -119,33 +123,37 @@ const LeadCapture: React.FC<LeadCaptureProps> = ({
             value={formData.name}
             onChange={handleInputChange}
             error={errors.name}
-            className="pl-10"
+            className="pl-12 py-4 rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-500"
           />
         </div>
 
         <div className="relative">
-          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           <Input
             type="email"
             name="email"
-            placeholder="Your email address"
+            placeholder="Your work email"
             value={formData.email}
             onChange={handleInputChange}
             error={errors.email}
-            className="pl-10"
+            className="pl-12 py-4 rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-500"
           />
         </div>
 
         <div className="relative">
-          <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+          </div>
           <Input
-            type="tel"
-            name="phone"
-            placeholder="Your phone number (optional)"
-            value={formData.phone}
+            type="text"
+            name="company"
+            placeholder="Company name"
+            value={formData.company}
             onChange={handleInputChange}
-            error={errors.phone}
-            className="pl-10"
+            error={errors.company}
+            className="pl-12 py-4 rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-500"
           />
         </div>
 
@@ -154,23 +162,35 @@ const LeadCapture: React.FC<LeadCaptureProps> = ({
           variant="primary"
           size="lg"
           loading={isSubmitting}
-          className="w-full"
+          className="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
         >
-          Get Started
-          <ArrowRight className="ml-2 w-5 h-5" />
+          {isSubmitting ? (
+            'Processing...'
+          ) : (
+            <>
+              Start Your AI Journey
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </>
+          )}
         </Button>
       </form>
 
-      <div className="mt-4 text-center">
-        <p className="text-xs text-gray-500">
+      <div className="mt-6 text-center">
+        <div className="flex items-center justify-center space-x-2 text-sm text-gray-500 mb-3">
+          <Shield className="w-4 h-4 text-green-500" />
+          <span>Enterprise-grade security & privacy</span>
+        </div>
+        
+        <p className="text-xs text-gray-500 leading-relaxed">
           By submitting this form, you agree to our{' '}
-          <a href="/privacy" className="text-primary-600 hover:underline">
+          <a href="/privacy" className="text-blue-600 hover:underline font-medium">
             Privacy Policy
           </a>{' '}
           and{' '}
-          <a href="/terms" className="text-primary-600 hover:underline">
+          <a href="/terms" className="text-blue-600 hover:underline font-medium">
             Terms of Service
           </a>
+          . We respect your privacy and will never share your information.
         </p>
       </div>
     </div>

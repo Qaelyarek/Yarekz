@@ -1,7 +1,7 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Menu, X, MessageCircle, Phone } from 'lucide-react';
-import Button from '@components/ui/Button';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu, X, MessageCircle, Phone, Sparkles } from 'lucide-react';
+import Button from '../ui/Button';
 
 interface HeaderProps {
   onMenuToggle?: () => void;
@@ -9,47 +9,113 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const navItems = [
+    { name: 'Home', path: '/' },
+    { name: 'Features', path: '/features' },
+    { name: 'AI Solutions', path: '/ai-solutions' },
+    { name: 'About', path: '/about' },
+    { name: 'Contact', path: '/contact' },
+  ];
+
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+    <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+      isScrolled 
+        ? 'bg-white/95 backdrop-blur-lg shadow-lg border-b border-gray-200/50' 
+        : 'bg-transparent'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-16 lg:h-20">
           {/* Logo */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">Y</span>
+            <Link to="/" className="flex items-center space-x-3 group">
+              <div className="relative">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <Sparkles className="w-6 h-6 text-white" />
+                </div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
               </div>
-              <span className="text-xl font-bold text-gray-900">Yarekz</span>
+              <div className="flex flex-col">
+                <span className={`text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent ${
+                  !isScrolled && location.pathname === '/' ? 'text-white bg-none' : ''
+                }`}>
+                  Yarekz
+                </span>
+                <span className={`text-xs font-medium ${
+                  !isScrolled && location.pathname === '/' ? 'text-blue-200' : 'text-gray-500'
+                }`}>
+                  AI Solutions
+                </span>
+              </div>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-gray-700 hover:text-primary-600 transition-colors">
-              Home
-            </Link>
-            <Link to="/services" className="text-gray-700 hover:text-primary-600 transition-colors">
-              Services
-            </Link>
-            <Link to="/about" className="text-gray-700 hover:text-primary-600 transition-colors">
-              About
-            </Link>
-            <Link to="/contact" className="text-gray-700 hover:text-primary-600 transition-colors">
-              Contact
-            </Link>
+          <nav className="hidden lg:flex items-center space-x-8">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`relative font-medium transition-colors duration-300 hover:text-blue-600 ${
+                  location.pathname === item.path
+                    ? 'text-blue-600'
+                    : !isScrolled && location.pathname === '/'
+                    ? 'text-white hover:text-blue-200'
+                    : 'text-gray-700'
+                }`}
+              >
+                {item.name}
+                {location.pathname === item.path && (
+                  <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-blue-600 rounded-full"></div>
+                )}
+              </Link>
+            ))}
           </nav>
 
           {/* Action Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" size="sm">
+          <div className="hidden lg:flex items-center space-x-4">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className={`${
+                !isScrolled && location.pathname === '/' 
+                  ? 'text-white hover:bg-white/10' 
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
               <MessageCircle className="w-4 h-4 mr-2" />
               Chat
             </Button>
-            <Button variant="ghost" size="sm">
+            
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className={`${
+                !isScrolled && location.pathname === '/' 
+                  ? 'text-white hover:bg-white/10' 
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
               <Phone className="w-4 h-4 mr-2" />
               Call
             </Button>
-            <Button variant="primary" size="sm">
+            
+            <Button 
+              variant="primary" 
+              size="sm"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+            >
               Get Started
             </Button>
           </div>
@@ -57,7 +123,11 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
           {/* Mobile Menu Button */}
           <button
             onClick={onMenuToggle}
-            className="md:hidden p-2 rounded-md text-gray-700 hover:text-primary-600 hover:bg-gray-100"
+            className={`lg:hidden p-2 rounded-xl transition-all duration-300 ${
+              !isScrolled && location.pathname === '/' 
+                ? 'text-white hover:bg-white/10' 
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
           >
             {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -66,37 +136,32 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-200">
-          <div className="px-4 py-2 space-y-1">
-            <Link
-              to="/"
-              className="block px-3 py-2 text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md"
-            >
-              Home
-            </Link>
-            <Link
-              to="/services"
-              className="block px-3 py-2 text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md"
-            >
-              Services
-            </Link>
-            <Link
-              to="/about"
-              className="block px-3 py-2 text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md"
-            >
-              About
-            </Link>
-            <Link
-              to="/contact"
-              className="block px-3 py-2 text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md"
-            >
-              Contact
-            </Link>
-            <div className="pt-2 border-t border-gray-200">
-              <Button variant="primary" className="w-full mb-2">
+        <div className="lg:hidden bg-white/95 backdrop-blur-lg border-t border-gray-200/50">
+          <div className="px-4 py-6 space-y-4">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`block px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
+                  location.pathname === item.path
+                    ? 'bg-blue-50 text-blue-600'
+                    : 'text-gray-700 hover:bg-gray-50'
+                }`}
+                onClick={onMenuToggle}
+              >
+                {item.name}
+              </Link>
+            ))}
+            
+            <div className="pt-4 border-t border-gray-200">
+              <Button 
+                variant="primary" 
+                className="w-full mb-3 bg-gradient-to-r from-blue-600 to-purple-600"
+              >
                 Get Started
               </Button>
-              <div className="flex space-x-2">
+              
+              <div className="flex space-x-3">
                 <Button variant="ghost" size="sm" className="flex-1">
                   <MessageCircle className="w-4 h-4 mr-2" />
                   Chat
