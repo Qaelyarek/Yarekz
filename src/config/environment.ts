@@ -51,9 +51,9 @@ export const env: EnvironmentConfig = {
   azureSpeechKey: getEnvVar('VITE_AZURE_SPEECH_KEY'),
   azureSpeechRegion: getEnvVar('VITE_AZURE_SPEECH_REGION'),
   
-  // VAPI Voice Integration - Using the specific agent ID provided
+  // VAPI Voice Integration - Using the provided credentials
   vapiAssistantId: getEnvVar('VITE_VAPI_ASSISTANT_ID', 'd7f2e641-d690-412d-b8b0-db973ff0d937'),
-  vapiPublicKey: getEnvVar('VITE_VAPI_PUBLIC_KEY', 'your-vapi-public-key-here'),
+  vapiPublicKey: getEnvVar('VITE_VAPI_PUBLIC_KEY', '59daf631-d47d-4697-8ad5-ba84ec36eaa7'),
   
   // Analytics
   googleAnalyticsId: getEnvVar('VITE_GOOGLE_ANALYTICS_ID'),
@@ -89,4 +89,18 @@ export const validateRequiredEnvVars = () => {
       throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
     }
   }
+};
+
+// VAPI specific validation
+export const validateVAPIConfig = () => {
+  const vapiKeys = ['VITE_VAPI_ASSISTANT_ID', 'VITE_VAPI_PUBLIC_KEY'];
+  const missing = vapiKeys.filter(key => !getEnvVar(key));
+  
+  if (missing.length > 0) {
+    console.warn(`VAPI configuration incomplete. Missing: ${missing.join(', ')}`);
+    return false;
+  }
+  
+  console.log('✅ VAPI configuration validated');
+  return true;
 };
