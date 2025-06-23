@@ -114,8 +114,8 @@ class VAPIService {
     });
 
     // Connection events
-    this.vapi.on('connection-status-changed', (status: string) => {
-      console.log('🔗 Connection status changed:', status);
+    this.vapi.on('connection-status-changed' as any, (status: string) => {
+  console.log('Status:', status);
       this.emitEvent('connection-status', status);
     });
 
