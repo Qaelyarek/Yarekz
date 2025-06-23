@@ -165,9 +165,7 @@ class VAPIService {
       console.log(`  Assistant ID: ${this.assistantId}`);
       console.log(`  Phone Number: ${phoneNumber || 'Web call (microphone)'}`);
 
-      const callConfig: any = {
-        assistantId: this.assistantId,
-      };
+      const callConfig: any = {};
 
       // Add phone number for outbound calls
       if (phoneNumber) {
