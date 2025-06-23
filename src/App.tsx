@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import VAPIDemo from './components/VAPIDemo';
+import AIPhoneHero from './components/hero/AIPhoneHero';
 import AIPhoneCaller from './components/ai/AIPhoneCaller';
 import { validateRequiredEnvVars, isDevelopment } from './config/environment';
 import { 
@@ -40,8 +41,9 @@ function App() {
         
         <main>
           <Routes>
-            <Route path="/" element={<MinimalistCEOFunnel />} />
+            <Route path="/" element={<HomePage />} />
             <Route path="/vapi-demo" element={<VAPIDemo />} />
+            <Route path="/hero-demo" element={<AIPhoneHero />} />
           </Routes>
         </main>
 
@@ -50,6 +52,19 @@ function App() {
     </Router>
   );
 }
+
+// Main Homepage Component
+const HomePage: React.FC = () => {
+  return (
+    <>
+      {/* Hero Section with AI Phone Integration */}
+      <AIPhoneHero />
+      
+      {/* Original CEO Funnel Content */}
+      <MinimalistCEOFunnel />
+    </>
+  );
+};
 
 // Minimalist CEO-Focused Funnel Page
 const MinimalistCEOFunnel: React.FC = () => {
@@ -69,103 +84,6 @@ const MinimalistCEOFunnel: React.FC = () => {
 
   return (
     <div className="bg-white">
-      {/* Hero Section - Minimalist Black & White */}
-      <section className="relative bg-black text-white min-h-screen flex items-center overflow-hidden">
-        {/* Subtle Tech Grid Background */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="grid grid-cols-12 h-full">
-            {[...Array(144)].map((_, i) => (
-              <div key={i} className="border border-white"></div>
-            ))}
-          </div>
-        </div>
-
-        {/* Floating Tech Elements */}
-        <div className="absolute inset-0">
-          <div className="absolute top-20 left-20 w-2 h-2 bg-white rounded-full animate-pulse"></div>
-          <div className="absolute top-40 right-32 w-1 h-1 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute bottom-32 left-1/4 w-1 h-1 bg-white rounded-full animate-pulse" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute top-1/3 right-1/4 w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className={`transform transition-all duration-1000 ${isVisible ? 'translate-x-0 opacity-100' : '-translate-x-10 opacity-0'}`}>
-              <div className="inline-flex items-center px-4 py-2 border border-gray-600 rounded-full text-gray-300 text-sm font-medium mb-8">
-                <Bot className="w-4 h-4 mr-2" />
-                AI-Powered Phone System
-              </div>
-              
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-                Supercharge Your Growth with{' '}
-                <span className="relative">
-                  AI-Driven
-                  <div className="absolute bottom-0 left-0 w-full h-1 bg-white"></div>
-                </span>{' '}
-                Solutions
-              </h1>
-              
-              <p className="text-xl lg:text-2xl mb-12 text-gray-300 leading-relaxed max-w-2xl">
-                Automate Your Appointments, Boost Conversions, and Let AI Do the Work for You. 
-                Purpose-built for Business Funding, Ecommerce, and Coaching professionals.
-              </p>
-              
-              <div className="mb-12">
-                <AIPhoneCaller 
-                  onConnect={handleAIConnect}
-                  onDisconnect={handleAIDisconnect}
-                  debugMode={isDevelopment}
-                />
-              </div>
-
-              {/* Trust Indicators - Minimalist */}
-              <div className="flex items-center space-x-8 text-gray-400">
-                <div className="flex items-center">
-                  <div className="flex -space-x-1">
-                    <div className="w-6 h-6 bg-white rounded-full border border-black"></div>
-                    <div className="w-6 h-6 bg-gray-600 rounded-full border border-black"></div>
-                    <div className="w-6 h-6 bg-gray-400 rounded-full border border-black"></div>
-                  </div>
-                  <span className="ml-3 text-sm">500+ CEOs trust our AI</span>
-                </div>
-                <div className="flex items-center text-sm">
-                  <Zap className="w-4 h-4 mr-2" />
-                  <span>24/7 Available</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Side - Stats Display */}
-            <div className={`lg:justify-self-end transform transition-all duration-1000 delay-300 ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'}`}>
-              <div className="bg-white text-black border-2 border-black rounded-2xl p-8 max-w-md">
-                <h3 className="text-2xl font-bold mb-6 text-center">Real Results</h3>
-                
-                <div className="grid grid-cols-2 gap-6">
-                  {[
-                    { value: "300%", label: "More Appointments" },
-                    { value: "85%", label: "Reduction in No-Shows" },
-                    { value: "24/7", label: "AI Availability" },
-                    { value: "$50K+", label: "Additional Revenue" }
-                  ].map((stat, index) => (
-                    <div key={index} className="text-center">
-                      <div className="text-3xl font-bold mb-1">{stat.value}</div>
-                      <div className="text-sm text-gray-600">{stat.label}</div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <div className="flex items-center justify-center text-sm text-gray-600">
-                    <CheckCircle className="w-4 h-4 mr-2 text-green-600" />
-                    Average results in 30 days
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Features Section - Minimalist */}
       <section className="py-20 lg:py-32 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

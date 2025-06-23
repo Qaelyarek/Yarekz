@@ -1,6 +1,13 @@
 // Environment configuration and validation
 
 interface EnvironmentConfig {
+  // VAPI Configuration
+  vapiApiKey: string;
+  vapiAssistantId: string;
+  vapiPublicKey: string;
+  vapiEndpoint: string;
+  callWebhookUrl: string;
+  
   // AI Services
   openaiApiKey: string;
   anthropicApiKey: string;
@@ -10,10 +17,6 @@ interface EnvironmentConfig {
   elevenlabsApiKey: string;
   azureSpeechKey: string;
   azureSpeechRegion: string;
-  
-  // VAPI Voice Integration
-  vapiAssistantId: string;
-  vapiPublicKey: string;
   
   // Analytics
   googleAnalyticsId: string;
@@ -41,6 +44,13 @@ const getEnvVar = (key: string, defaultValue?: string): string => {
 };
 
 export const env: EnvironmentConfig = {
+  // VAPI Configuration
+  vapiApiKey: getEnvVar('VITE_VAPI_API_KEY'),
+  vapiAssistantId: getEnvVar('VITE_VAPI_ASSISTANT_ID'),
+  vapiPublicKey: getEnvVar('VITE_VAPI_PUBLIC_KEY'),
+  vapiEndpoint: getEnvVar('VITE_VAPI_ENDPOINT', 'https://api.vapi.ai'),
+  callWebhookUrl: getEnvVar('VITE_CALL_WEBHOOK_URL'),
+  
   // AI Services
   openaiApiKey: getEnvVar('VITE_OPENAI_API_KEY'),
   anthropicApiKey: getEnvVar('VITE_ANTHROPIC_API_KEY'),
@@ -50,10 +60,6 @@ export const env: EnvironmentConfig = {
   elevenlabsApiKey: getEnvVar('VITE_ELEVENLABS_API_KEY'),
   azureSpeechKey: getEnvVar('VITE_AZURE_SPEECH_KEY'),
   azureSpeechRegion: getEnvVar('VITE_AZURE_SPEECH_REGION'),
-  
-  // VAPI Voice Integration - Securely from environment variables
-  vapiAssistantId: getEnvVar('VITE_VAPI_ASSISTANT_ID'),
-  vapiPublicKey: getEnvVar('VITE_VAPI_PUBLIC_KEY'),
   
   // Analytics
   googleAnalyticsId: getEnvVar('VITE_GOOGLE_ANALYTICS_ID'),
@@ -91,26 +97,29 @@ export const validateVAPIConfig = (): boolean => {
     return false;
   }
   
-  // Basic format validation
-  if (!assistantId.match(/^[a-f0-9-]{36}$/)) {
-    console.error('❌ VAPI Assistant ID format is invalid');
-    return false;
+  // Basic format validation for UUID-like strings
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  
+  if (!uuidRegex.test(assistantId)) {
+    console.warn('⚠️ VAPI Assistant ID format appears invalid (expected UUID format)');
   }
   
-  if (!publicKey.match(/^[a-f0-9-]{36}$/)) {
-    console.error('❌ VAPI Public Key format is invalid');
-    return false;
+  if (!uuidRegex.test(publicKey)) {
+    console.warn('⚠️ VAPI Public Key format appears invalid (expected UUID format)');
   }
   
   console.log('✅ VAPI configuration validated successfully');
   return true;
 };
 
-// Validation helper
+// Environment validation helper
 export const validateRequiredEnvVars = () => {
   const requiredForProduction = [
     'VITE_SUPABASE_URL',
     'VITE_SUPABASE_ANON_KEY',
+  ];
+
+  const requiredForVAPI = [
     'VITE_VAPI_ASSISTANT_ID',
     'VITE_VAPI_PUBLIC_KEY',
   ];
@@ -121,4 +130,18 @@ export const validateRequiredEnvVars = () => {
       throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
     }
   }
+
+  // Validate VAPI configuration
+  const missingVAPI = requiredForVAPI.filter(key => !getEnvVar(key));
+  if (missingVAPI.length > 0) {
+    console.warn(`VAPI functionality will be limited. Missing: ${missingVAPI.join(', ')}`);
+  }
+};
+
+// Export validation status
+export const envValidation = {
+  isVAPIConfigured: validateVAPIConfig(),
+  isDevelopment,
+  isProduction,
+  isStaging,
 };
