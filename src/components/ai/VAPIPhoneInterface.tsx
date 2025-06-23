@@ -84,7 +84,7 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
     if (message.type === 'transcript' && message.transcript) {
       const entry: TranscriptEntry = {
         id: `${Date.now()}-${Math.random()}`,
-        role: message.role || 'assistant',
+        role: (message.role === 'system' ? 'assistant' : message.role) as 'assistant' | 'user',
         content: message.transcript,
         timestamp: new Date(),
       };
