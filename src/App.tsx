@@ -45,7 +45,11 @@ function App() {
 }
 
 // Minimalist CEO-Focused Funnel Page
-const MinimalistCEOFunnel: React.FC<{ onLeadSubmit: (lead: Partial<Lead>) => void }> = ({ onLeadSubmit }) => {
+interface MinimalistCEOFunnelProps {
+  onLeadSubmit: (lead: Partial<Lead>) => void;
+}
+
+const MinimalistCEOFunnel: React.FC<MinimalistCEOFunnelProps> = ({ onLeadSubmit }) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
