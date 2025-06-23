@@ -1,105 +1,142 @@
 // VAPI voice integration service
 import { env } from '../config/environment';
 
+// Hardcoded agent ID as specified
+const VAPI_ASSISTANT_ID = 'd7f2e641-d690-412d-b8b0-db973ff0d937';
+
+declare global {
+  interface Window {
+    Vapi: any;
+  }
+}
+
 class VAPIService {
-  private assistantId: string;
+  private vapi: any = null;
   private publicKey: string;
-  private baseUrl: string = 'https://api.vapi.ai';
+  private isInitialized: boolean = false;
 
   constructor() {
-    this.assistantId = env.vapiAssistantId;
-    this.publicKey = env.vapiPublicKey;
+    this.publicKey = env.vapiPublicKey || 'your-vapi-public-key'; // You'll need to set this
+    this.initializeVapi();
   }
 
-  async startCall(phoneNumber?: string): Promise<{ callId: string; status: string }> {
-    if (!this.assistantId || !this.publicKey) {
-      throw new Error('VAPI credentials not configured');
+  private initializeVapi(): void {
+    if (typeof window === 'undefined' || !window.Vapi) {
+      console.warn('VAPI SDK not loaded');
+      return;
     }
 
     try {
-      const response = await fetch(`${this.baseUrl}/call`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.publicKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          assistantId: this.assistantId,
-          customer: phoneNumber ? { number: phoneNumber } : undefined,
-        }),
-      });
+      this.vapi = new window.Vapi(this.publicKey);
+      this.isInitialized = true;
+      console.log('VAPI initialized successfully');
+      
+      // Set up event listeners
+      this.setupEventListeners();
+    } catch (error) {
+      console.error('Failed to initialize VAPI:', error);
+    }
+  }
 
-      if (!response.ok) {
-        throw new Error(`VAPI API error: ${response.statusText}`);
+  private setupEventListeners(): void {
+    if (!this.vapi) return;
+
+    this.vapi.on('call-start', () => {
+      console.log('Call started');
+    });
+
+    this.vapi.on('call-end', () => {
+      console.log('Call ended');
+    });
+
+    this.vapi.on('speech-start', () => {
+      console.log('User started speaking');
+    });
+
+    this.vapi.on('speech-end', () => {
+      console.log('User stopped speaking');
+    });
+
+    this.vapi.on('message', (message: any) => {
+      console.log('Message received:', message);
+    });
+
+    this.vapi.on('error', (error: any) => {
+      console.error('VAPI error:', error);
+    });
+  }
+
+  async startCall(phoneNumber?: string): Promise<{ success: boolean; message: string }> {
+    if (!this.isInitialized || !this.vapi) {
+      // Try to initialize again
+      this.initializeVapi();
+      
+      if (!this.vapi) {
+        return {
+          success: false,
+          message: 'VAPI not initialized. Please ensure VAPI SDK is loaded.'
+        };
       }
+    }
 
-      const data = await response.json();
+    try {
+      const callConfig = {
+        assistantId: VAPI_ASSISTANT_ID,
+        ...(phoneNumber && { customer: { number: phoneNumber } })
+      };
+
+      await this.vapi.start(callConfig);
+      
       return {
-        callId: data.id,
-        status: data.status,
+        success: true,
+        message: 'Call started successfully'
       };
     } catch (error) {
-      console.error('VAPI service error:', error);
-      throw error;
+      console.error('Failed to start call:', error);
+      return {
+        success: false,
+        message: `Failed to start call: ${error instanceof Error ? error.message : 'Unknown error'}`
+      };
     }
   }
 
-  async getCallStatus(callId: string): Promise<any> {
-    if (!this.publicKey) {
-      throw new Error('VAPI public key not configured');
-    }
+  async endCall(): Promise<void> {
+    if (!this.vapi) return;
 
     try {
-      const response = await fetch(`${this.baseUrl}/call/${callId}`, {
-        headers: {
-          'Authorization': `Bearer ${this.publicKey}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`VAPI API error: ${response.statusText}`);
-      }
-
-      return await response.json();
+      await this.vapi.stop();
+      console.log('Call ended successfully');
     } catch (error) {
-      console.error('VAPI get call status error:', error);
-      throw error;
+      console.error('Failed to end call:', error);
     }
   }
 
-  async endCall(callId: string): Promise<void> {
-    if (!this.publicKey) {
-      throw new Error('VAPI public key not configured');
-    }
+  isMuted(): boolean {
+    return this.vapi?.isMuted() || false;
+  }
 
-    try {
-      const response = await fetch(`${this.baseUrl}/call/${callId}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${this.publicKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          status: 'ended',
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`VAPI API error: ${response.statusText}`);
-      }
-    } catch (error) {
-      console.error('VAPI end call error:', error);
-      throw error;
+  toggleMute(): void {
+    if (!this.vapi) return;
+    
+    if (this.isMuted()) {
+      this.vapi.unmute();
+    } else {
+      this.vapi.mute();
     }
   }
 
-  // Initialize VAPI web client for browser-based calls
-  initializeWebClient(): void {
-    if (typeof window === 'undefined') return;
+  isCallActive(): boolean {
+    return this.vapi?.isCallActive() || false;
+  }
 
-    // This would initialize the VAPI web SDK
-    // You'll need to include their script in your HTML or install their package
-    console.log('Initializing VAPI web client with assistant:', this.assistantId);
+  // Get the assistant ID being used
+  getAssistantId(): string {
+    return VAPI_ASSISTANT_ID;
+  }
+
+  // Check if VAPI is properly initialized
+  isReady(): boolean {
+    return this.isInitialized && !!this.vapi;
   }
 }
 

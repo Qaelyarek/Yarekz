@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, MessageCircle, Phone } from 'lucide-react';
 import Button from '../ui/Button';
+import VAPIService from '../../ai-services/vapi';
 
 interface HeaderProps {
   onMenuToggle?: () => void;
@@ -20,6 +21,17 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleCallAI = async () => {
+    try {
+      const result = await VAPIService.startCall();
+      if (!result.success) {
+        alert(`Failed to connect: ${result.message}`);
+      }
+    } catch (error) {
+      alert('Failed to connect to AI agent');
+    }
+  };
 
   const navItems = [
     { name: 'Home', path: '/' },
@@ -107,6 +119,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
             <Button 
               variant="primary" 
               size="sm"
+              onClick={handleCallAI}
               className={`${
                 !isScrolled && location.pathname === '/' 
                   ? 'bg-white text-black hover:bg-gray-100' 
@@ -154,6 +167,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
             <div className="pt-4 border-t border-gray-200">
               <Button 
                 variant="primary" 
+                onClick={handleCallAI}
                 className="w-full mb-3 bg-black text-white"
               >
                 Call AI Agent
@@ -164,7 +178,12 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
                   <MessageCircle className="w-4 h-4 mr-2" />
                   Chat
                 </Button>
-                <Button variant="ghost" size="sm" className="flex-1 border-2 border-black text-black">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={handleCallAI}
+                  className="flex-1 border-2 border-black text-black"
+                >
                   <Phone className="w-4 h-4 mr-2" />
                   Call
                 </Button>

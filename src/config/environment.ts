@@ -51,9 +51,9 @@ export const env: EnvironmentConfig = {
   azureSpeechKey: getEnvVar('VITE_AZURE_SPEECH_KEY'),
   azureSpeechRegion: getEnvVar('VITE_AZURE_SPEECH_REGION'),
   
-  // VAPI Voice Integration
-  vapiAssistantId: getEnvVar('VITE_VAPI_ASSISTANT_ID'),
-  vapiPublicKey: getEnvVar('VITE_VAPI_PUBLIC_KEY'),
+  // VAPI Voice Integration - Using the specific agent ID provided
+  vapiAssistantId: getEnvVar('VITE_VAPI_ASSISTANT_ID', 'd7f2e641-d690-412d-b8b0-db973ff0d937'),
+  vapiPublicKey: getEnvVar('VITE_VAPI_PUBLIC_KEY', 'your-vapi-public-key-here'),
   
   // Analytics
   googleAnalyticsId: getEnvVar('VITE_GOOGLE_ANALYTICS_ID'),
