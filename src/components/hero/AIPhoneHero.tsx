@@ -3,7 +3,6 @@ import { Phone, PhoneOff, Mic, MicOff, Volume2, VolumeX, Loader2 } from 'lucide-
 import StarBorder from '../ui/star-border';
 import VoiceWaveform from '../ai/VoiceWaveform';
 import VAPIService from '../../ai-services/vapi';
-import { validateVAPIConfig } from '../../config/environment';
 
 interface AIPhoneHeroProps {
   className?: string;
