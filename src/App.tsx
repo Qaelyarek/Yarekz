@@ -227,7 +227,7 @@ const AISolutionsPage = () => (
 
 const AboutPage = () => (
   <div className="max-w-7xl mx-auto px-4 py-20">
-    <h1 className="text-4xl font-bold text-gray-900 mb-8">About Yarekz</h1>
+    <h1 className="text-4xl font-bold text-gray-900 mb-8">About QY Growth</h1>
     <p className="text-xl text-gray-600">About page coming soon...</p>
   </div>
 );

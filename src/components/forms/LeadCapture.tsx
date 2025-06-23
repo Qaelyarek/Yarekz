@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Mail, Phone, User, ArrowRight, Shield, Sparkles } from 'lucide-react';
+import { Mail, User, ArrowRight, Shield } from 'lucide-react';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
-import { validateEmail, validatePhone, generateId } from '../../utils/index';
+import { validateEmail, generateId } from '../../utils/index';
 import type { Lead } from '../../types/index';
 
 interface LeadCaptureProps {
@@ -105,9 +105,11 @@ const LeadCapture: React.FC<LeadCaptureProps> = ({
     <div className={`bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/20 ${className}`}>
       <div className="text-center mb-8">
         <div className="flex items-center justify-center mb-4">
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-            <Sparkles className="w-6 h-6 text-white" />
-          </div>
+          <img 
+            src="/logos/SystemAQ-logo.png" 
+            alt="QY Growth Logo" 
+            className="w-12 h-12 object-contain"
+          />
         </div>
         <h3 className="text-2xl font-bold text-gray-900 mb-2">{title}</h3>
         <p className="text-gray-600">{subtitle}</p>

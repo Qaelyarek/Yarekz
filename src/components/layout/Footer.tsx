@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles, Mail, Phone, MapPin, Twitter, Linkedin, Instagram, Facebook } from 'lucide-react';
+import { Mail, Phone, MapPin, Twitter, Linkedin, Instagram, Facebook } from 'lucide-react';
 
 const Footer: React.FC = () => {
   return (
@@ -10,12 +10,14 @@ const Footer: React.FC = () => {
           {/* Company Info */}
           <div className="lg:col-span-1">
             <div className="flex items-center space-x-3 mb-6">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
+              <img 
+                src="/logos/SystemAQ-logo(w).png" 
+                alt="QY Growth Logo" 
+                className="w-12 h-12 object-contain"
+              />
               <div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                  Yarekz
+                  QY Growth
                 </span>
                 <div className="text-xs text-gray-400">AI Solutions</div>
               </div>
@@ -112,7 +114,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-4">
               <li className="flex items-center space-x-3">
                 <Mail className="w-5 h-5 text-blue-400" />
-                <span className="text-gray-300">hello@yarekz.com</span>
+                <span className="text-gray-300">hello@qygrowth.com</span>
               </li>
               <li className="flex items-center space-x-3">
                 <Phone className="w-5 h-5 text-blue-400" />
@@ -148,7 +150,7 @@ const Footer: React.FC = () => {
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            © 2025 Yarekz. All rights reserved. | Powered by AI Innovation
+            © 2025 QY Growth. All rights reserved. | Powered by AI Innovation
           </p>
           <div className="flex items-center space-x-6 mt-4 md:mt-0">
             <span className="text-gray-400 text-sm">🔒 Enterprise-grade security</span>

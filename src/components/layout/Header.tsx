@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, MessageCircle, Phone, Sparkles } from 'lucide-react';
+import { Menu, X, MessageCircle, Phone } from 'lucide-react';
 import Button from '../ui/Button';
 
 interface HeaderProps {
@@ -41,16 +41,20 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-3 group">
               <div className="relative">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <Sparkles className="w-6 h-6 text-white" />
-                </div>
+                <img 
+                  src={!isScrolled && location.pathname === '/' ? "/logos/SystemAQ-logo(w).png" : "/logos/SystemAQ-logo.png"} 
+                  alt="QY Growth Logo" 
+                  className="w-12 h-12 object-contain group-hover:scale-110 transition-transform duration-300"
+                />
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
               </div>
               <div className="flex flex-col">
-                <span className={`text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent ${
-                  !isScrolled && location.pathname === '/' ? 'text-white bg-none' : ''
+                <span className={`text-2xl font-bold ${
+                  !isScrolled && location.pathname === '/' 
+                    ? 'text-white' 
+                    : 'bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'
                 }`}>
-                  Yarekz
+                  QY Growth
                 </span>
                 <span className={`text-xs font-medium ${
                   !isScrolled && location.pathname === '/' ? 'text-blue-200' : 'text-gray-500'
