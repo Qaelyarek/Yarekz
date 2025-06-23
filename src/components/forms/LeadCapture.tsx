@@ -74,7 +74,7 @@ const LeadCapture: React.FC<LeadCaptureProps> = ({
         id: generateId(),
         name: formData.name.trim(),
         email: formData.email.trim(),
-        source: 'ceo-funnel',
+        source: 'website',
         status: 'new',
         score: 50, // Higher initial score for CEO funnel
         interactions: [
