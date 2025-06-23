@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, User, ArrowRight, Shield } from 'lucide-react';
+import { Mail, User, ArrowRight, Shield, MessageCircle, Building } from 'lucide-react';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 import { validateEmail, generateId } from '../../utils/index';
@@ -14,19 +14,20 @@ interface LeadCaptureProps {
 
 const LeadCapture: React.FC<LeadCaptureProps> = ({
   onSubmit,
-  title = "Get Started Today",
-  subtitle = "Join thousands of satisfied customers",
+  title = "Get Your AI Demo",
+  subtitle = "See how AI can 10x your appointments",
   className = "",
 }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     company: '',
+    industry: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     
@@ -53,6 +54,10 @@ const LeadCapture: React.FC<LeadCaptureProps> = ({
       newErrors.company = 'Company name is required';
     }
 
+    if (!formData.industry) {
+      newErrors.industry = 'Please select your industry';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -69,14 +74,14 @@ const LeadCapture: React.FC<LeadCaptureProps> = ({
         id: generateId(),
         name: formData.name.trim(),
         email: formData.email.trim(),
-        source: 'website',
+        source: 'ceo-funnel',
         status: 'new',
-        score: 25, // Initial score for form submission
+        score: 50, // Higher initial score for CEO funnel
         interactions: [
           {
             id: generateId(),
             type: 'form',
-            content: `Lead captured via form: ${formData.name} (${formData.email}) from ${formData.company}`,
+            content: `CEO lead captured: ${formData.name} (${formData.email}) from ${formData.company} - ${formData.industry} industry`,
             timestamp: new Date(),
             aiGenerated: false,
           },
@@ -88,10 +93,10 @@ const LeadCapture: React.FC<LeadCaptureProps> = ({
       await onSubmit(leadData);
       
       // Reset form
-      setFormData({ name: '', email: '', company: '' });
+      setFormData({ name: '', email: '', company: '', industry: '' });
       
-      // Show success message (you might want to add a success state)
-      alert('Thank you! We\'ll be in touch soon with your personalized AI recommendations.');
+      // Show success message
+      alert('Success! We\'ll contact you within 15 minutes to schedule your AI demo.');
       
     } catch (error) {
       console.error('Lead submission error:', error);
@@ -113,6 +118,14 @@ const LeadCapture: React.FC<LeadCaptureProps> = ({
         </div>
         <h3 className="text-2xl font-bold text-gray-900 mb-2">{title}</h3>
         <p className="text-gray-600">{subtitle}</p>
+        
+        {/* Urgency indicator */}
+        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <div className="flex items-center justify-center text-red-700 text-sm font-medium">
+            <div className="w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse"></div>
+            Limited: Only 50 CEOs accepted this month
+          </div>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -134,7 +147,7 @@ const LeadCapture: React.FC<LeadCaptureProps> = ({
           <Input
             type="email"
             name="email"
-            placeholder="Your work email"
+            placeholder="Your CEO/executive email"
             value={formData.email}
             onChange={handleInputChange}
             error={errors.email}
@@ -143,11 +156,7 @@ const LeadCapture: React.FC<LeadCaptureProps> = ({
         </div>
 
         <div className="relative">
-          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
-          </div>
+          <Building className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           <Input
             type="text"
             name="company"
@@ -159,6 +168,26 @@ const LeadCapture: React.FC<LeadCaptureProps> = ({
           />
         </div>
 
+        <div className="relative">
+          <select
+            name="industry"
+            value={formData.industry}
+            onChange={handleInputChange}
+            className={`w-full px-4 py-4 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 ${
+              errors.industry ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : ''
+            }`}
+          >
+            <option value="">Select your industry</option>
+            <option value="business-funding">Business Funding & Tax Strategy</option>
+            <option value="ecommerce">Ecommerce</option>
+            <option value="business-coaching">Business Coaching</option>
+            <option value="other">Other</option>
+          </select>
+          {errors.industry && (
+            <p className="mt-1 text-sm text-red-600">{errors.industry}</p>
+          )}
+        </div>
+
         <Button
           type="submit"
           variant="primary"
@@ -167,10 +196,11 @@ const LeadCapture: React.FC<LeadCaptureProps> = ({
           className="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
         >
           {isSubmitting ? (
-            'Processing...'
+            'Submitting...'
           ) : (
             <>
-              Start Your AI Journey
+              <MessageCircle className="mr-2 w-5 h-5" />
+              Get My AI Demo
               <ArrowRight className="ml-2 w-5 h-5" />
             </>
           )}
@@ -180,19 +210,12 @@ const LeadCapture: React.FC<LeadCaptureProps> = ({
       <div className="mt-6 text-center">
         <div className="flex items-center justify-center space-x-2 text-sm text-gray-500 mb-3">
           <Shield className="w-4 h-4 text-green-500" />
-          <span>Enterprise-grade security & privacy</span>
+          <span>Your information is 100% secure</span>
         </div>
         
         <p className="text-xs text-gray-500 leading-relaxed">
-          By submitting this form, you agree to our{' '}
-          <a href="/privacy" className="text-blue-600 hover:underline font-medium">
-            Privacy Policy
-          </a>{' '}
-          and{' '}
-          <a href="/terms" className="text-blue-600 hover:underline font-medium">
-            Terms of Service
-          </a>
-          . We respect your privacy and will never share your information.
+          By submitting this form, you agree to be contacted about our AI solutions. 
+          We respect your privacy and will never share your information.
         </p>
       </div>
     </div>
