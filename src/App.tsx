@@ -4,20 +4,14 @@ import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import AIPhoneCaller from './components/ai/AIPhoneCaller';
 import { 
-  MessageCircle, 
-  Phone, 
-  Calendar, 
   TrendingUp, 
   Users, 
   Target, 
-  ChevronRight,
   Star,
   CheckCircle,
-  BarChart3,
   Clock,
   DollarSign,
   Shield,
-  PlayCircle,
   Zap,
   Bot
 } from 'lucide-react';
