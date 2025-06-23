@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Mail, Phone, User, ArrowRight } from 'lucide-react';
-import Button from '@components/ui/Button';
-import Input from '@components/ui/Input';
-import { validateEmail, validatePhone, generateId } from '@utils/index';
-import type { Lead } from '@types/index';
+import Button from '../ui/Button';
+import Input from '../ui/Input';
+import { validateEmail, validatePhone, generateId } from '../../utils/index';
+import type { Lead } from '../../types/index';
 
 interface LeadCaptureProps {
   onSubmit: (lead: Partial<Lead>) => void;

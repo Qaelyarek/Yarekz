@@ -1,16 +1,17 @@
 // Voice integration service using ElevenLabs and Azure Speech
-import { env } from '@config/environment';
-import type { VoiceSettings } from '@types/index';
+import { env } from '../config/environment';
+import type { VoiceSettings } from '../types/index';
 
 class VoiceService {
   private elevenlabsApiKey: string;
-  private azureSpeechKey: string;
-  private azureSpeechRegion: string;
+  // Note: Azure Speech variables temporarily commented out to avoid unused variable errors
+  // private azureSpeechKey: string;
+  // private azureSpeechRegion: string;
 
   constructor() {
     this.elevenlabsApiKey = env.elevenlabsApiKey;
-    this.azureSpeechKey = env.azureSpeechKey;
-    this.azureSpeechRegion = env.azureSpeechRegion;
+    // this.azureSpeechKey = env.azureSpeechKey;
+    // this.azureSpeechRegion = env.azureSpeechRegion;
   }
 
   async textToSpeech(text: string, settings: VoiceSettings): Promise<Blob> {
