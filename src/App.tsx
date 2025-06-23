@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
+import VAPIDemo from './components/VAPIDemo';
 import AIPhoneCaller from './components/ai/AIPhoneCaller';
 import { validateRequiredEnvVars, isDevelopment } from './config/environment';
 import { 
@@ -40,6 +41,7 @@ function App() {
         <main>
           <Routes>
             <Route path="/" element={<MinimalistCEOFunnel />} />
+            <Route path="/vapi-demo" element={<VAPIDemo />} />
           </Routes>
         </main>
 

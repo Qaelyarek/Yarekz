@@ -132,3 +132,27 @@
   background-size: 200px;
   animation: shimmer 1.5s linear infinite;
 }
+
+/* Hide VAPI default status UI */
+.vapi-status-container,
+.vapi-widget-container,
+.vapi-status-widget,
+[data-vapi-status],
+[class*="vapi-status"],
+[id*="vapi-status"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  position: absolute !important;
+  left: -9999px !important;
+  top: -9999px !important;
+}
+
+/* Hide any VAPI floating elements */
+.vapi-floating-button,
+.vapi-ui-overlay,
+[class*="vapi-floating"],
+[class*="vapi-overlay"] {
+  display: none !important;
+  visibility: hidden !important;
+}
