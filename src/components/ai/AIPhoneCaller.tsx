@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, PhoneCall, Mic, MicOff, PhoneOff, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Phone, PhoneCall, Mic, MicOff, PhoneOff, AlertTriangle, CheckCircle, Settings } from 'lucide-react';
 import VoiceAnimator from './VoiceAnimator';
 import VAPIService from '../../ai-services/vapi';
+import VAPIStatusIndicator from '../debug/VAPIStatusIndicator';
+import { vapiDebugger } from '../../utils/debug';
 import type { VAPICallResult } from '../../ai-services/vapi';
 
 interface AIPhoneCallerProps {
@@ -27,6 +29,7 @@ const AIPhoneCaller: React.FC<AIPhoneCallerProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [vapiStatus, setVapiStatus] = useState(VAPIService.getStatus());
   const [isAISpeaking, setIsAISpeaking] = useState(false);
+  const [showDebugPanel, setShowDebugPanel] = useState(false);
 
   // Call duration timer
   useEffect(() => {
@@ -166,20 +169,50 @@ const AIPhoneCaller: React.FC<AIPhoneCallerProps> = ({
     return <AlertTriangle className="w-4 h-4 text-gray-500" />;
   };
 
+  const runDiagnostics = () => {
+    vapiDebugger.runDiagnostics();
+    setShowDebugPanel(true);
+  };
+
   if (!isConnected) {
     return (
       <div className={`${className}`}>
         {debugMode && (
-          <div className="mb-4 p-3 bg-gray-100 rounded-lg text-sm">
-            <div className="flex items-center space-x-2 mb-2">
-              {getStatusIndicator()}
-              <span className="font-medium">VAPI Status</span>
+          <div className="mb-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                {getStatusIndicator()}
+                <span className="font-medium text-sm">VAPI Status</span>
+              </div>
+              <div className="flex space-x-2">
+                <button
+                  onClick={runDiagnostics}
+                  className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                >
+                  Run Diagnostics
+                </button>
+                <button
+                  onClick={() => setShowDebugPanel(!showDebugPanel)}
+                  className="p-1 hover:bg-gray-100 rounded"
+                >
+                  <Settings className="w-4 h-4 text-gray-500" />
+                </button>
+              </div>
             </div>
-            <div className="space-y-1 text-xs text-gray-600">
-              <div>SDK Loaded: {vapiStatus.sdkLoaded ? '✅' : '❌'}</div>
-              <div>Config Valid: {vapiStatus.configValid ? '✅' : '❌'}</div>
-              <div>Initialized: {vapiStatus.initialized ? '✅' : '❌'}</div>
-              <div>Assistant ID: {vapiStatus.assistantId}</div>
+            
+            {showDebugPanel && (
+              <VAPIStatusIndicator />
+            )}
+
+            <div className="grid grid-cols-2 gap-4 p-3 bg-gray-100 rounded-lg text-xs text-gray-600">
+              <div>
+                <div>SDK Loaded: {vapiStatus.sdkLoaded ? '✅' : '❌'}</div>
+                <div>Config Valid: {vapiStatus.configValid ? '✅' : '❌'}</div>
+              </div>
+              <div>
+                <div>Initialized: {vapiStatus.initialized ? '✅' : '❌'}</div>
+                <div>Assistant ID: {vapiStatus.assistantId.substring(0, 8)}...</div>
+              </div>
             </div>
           </div>
         )}
@@ -208,12 +241,20 @@ const AIPhoneCaller: React.FC<AIPhoneCallerProps> = ({
                 <div className="font-medium">Connection Error</div>
                 <div>{error}</div>
                 {debugMode && (
-                  <button
-                    onClick={() => VAPIService.testConfiguration()}
-                    className="mt-2 text-xs text-blue-600 hover:text-blue-800 underline"
-                  >
-                    Test Configuration
-                  </button>
+                  <div className="mt-2 space-x-2">
+                    <button
+                      onClick={() => VAPIService.testConfiguration()}
+                      className="text-xs text-blue-600 hover:text-blue-800 underline"
+                    >
+                      Test Configuration
+                    </button>
+                    <button
+                      onClick={runDiagnostics}
+                      className="text-xs text-blue-600 hover:text-blue-800 underline"
+                    >
+                      Run Full Diagnostics
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
@@ -240,6 +281,21 @@ const AIPhoneCaller: React.FC<AIPhoneCallerProps> = ({
           <div className="mt-4 text-center text-xs text-gray-500">
             <div>Agent: {vapiStatus.assistantId}</div>
             <div>Key: {vapiStatus.publicKeyHash}</div>
+            <div className="mt-2">
+              <button
+                onClick={() => (window as any).testVAPI?.()}
+                className="text-blue-600 hover:text-blue-800 underline"
+              >
+                Quick Test
+              </button>
+              {' | '}
+              <button
+                onClick={() => console.log('VAPI Status:', vapiStatus)}
+                className="text-blue-600 hover:text-blue-800 underline"
+              >
+                Log Status
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -313,6 +369,7 @@ const AIPhoneCaller: React.FC<AIPhoneCallerProps> = ({
           <div>Status: {isAISpeaking ? 'Speaking' : 'Listening'}</div>
           <div>Muted: {isMuted ? 'Yes' : 'No'}</div>
           <div>Agent: {vapiStatus.assistantId}</div>
+          <div>Duration: {formatDuration(callDuration)}</div>
         </div>
       )}
     </div>
