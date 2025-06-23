@@ -1,6 +1,6 @@
 // AI-powered content generation service
 import OpenAIService from './openai';
-import type { ContentItem } from '@types/index';
+import type { ContentItem } from '@types';
 
 class ContentGenerator {
   async generateBlogPost(topic: string, keywords: string[]): Promise<Partial<ContentItem>> {

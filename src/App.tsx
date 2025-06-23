@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from '@components/layout/Header';
 import LeadCapture from '@components/forms/LeadCapture';
-import type { Lead } from '@types/index';
+import type { Lead } from '@types';
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

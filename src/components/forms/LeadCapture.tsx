@@ -3,7 +3,7 @@ import { Mail, Phone, User, ArrowRight } from 'lucide-react';
 import Button from '@components/ui/Button';
 import Input from '@components/ui/Input';
 import { validateEmail, validatePhone, generateId } from '@utils/index';
-import type { Lead } from '@types/index';
+import type { Lead } from '@types';
 
 interface LeadCaptureProps {
   onSubmit: (lead: Partial<Lead>) => void;
