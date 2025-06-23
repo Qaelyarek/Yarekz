@@ -15,7 +15,7 @@ import {
   Zap,
   Bot
 } from 'lucide-react';
-import type { Lead } from './types/index';
+import type { Lead } from './types';
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
