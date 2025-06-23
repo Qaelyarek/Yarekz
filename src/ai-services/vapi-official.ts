@@ -71,10 +71,10 @@ class VAPIService {
     });
 
     this.vapi.on('call-end', () => {
-  console.log('Call ended');
+      console.log('📞 Call ended');
       this.isConnected = false;
       this.metrics = {};
-      this.emitEvent('call-end', data);
+      this.emitEvent('call-end');
     });
 
     // Speech and audio events
@@ -115,7 +115,7 @@ class VAPIService {
 
     // Connection events
     this.vapi.on('connection-status-changed' as any, (status: string) => {
-  console.log('Status:', status);
+      console.log('🔗 Connection status:', status);
       this.emitEvent('connection-status', status);
     });
 
