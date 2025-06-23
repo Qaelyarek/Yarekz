@@ -70,8 +70,8 @@ class VAPIService {
       this.emitEvent('call-start');
     });
 
-    this.vapi.on('call-end', (data: any) => {
-      console.log('📞 Call ended:', data);
+    this.vapi.on('call-end', () => {
+  console.log('Call ended');
       this.isConnected = false;
       this.metrics = {};
       this.emitEvent('call-end', data);
