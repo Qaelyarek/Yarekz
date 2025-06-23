@@ -1,4 +1,4 @@
-# Yarekz AI-Integrated Business Website
+# Ask Why? Growth AI-Integrated Business Website
 
 ## Project Overview
 
@@ -66,7 +66,7 @@ src/
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd yarekz-ai-business-website
+cd ask-why-growth-ai-business-website
 
 # Install dependencies
 npm install

@@ -1,4 +1,4 @@
-# QY Growth - AI-Powered Business Solutions
+# Ask Why? Growth - AI-Powered Business Solutions
 
 Transform your business with cutting-edge AI technology. Automate processes, enhance customer engagement, and boost conversions.
 
@@ -20,4 +20,4 @@ Transform your business with cutting-edge AI technology. Automate processes, enh
 
 ---
 
-*Powered by QY Growth AI Solutions*
+*Powered by Ask Why? Growth AI Solutions*

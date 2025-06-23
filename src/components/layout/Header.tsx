@@ -43,7 +43,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
               <div className="relative">
                 <img 
                   src="/logos/LOGO QY Growth.png" 
-                  alt="QY Growth Logo" 
+                  alt="Ask Why? Growth Logo" 
                   className="w-12 h-12 object-contain group-hover:scale-110 transition-transform duration-300"
                 />
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
@@ -54,7 +54,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
                     ? 'text-white' 
                     : 'text-black'
                 }`}>
-                  QY Growth
+                  Ask Why? Growth
                 </span>
                 <span className={`text-xs font-medium ${
                   !isScrolled && location.pathname === '/' ? 'text-gray-300' : 'text-gray-500'

@@ -12,12 +12,12 @@ const Footer: React.FC = () => {
             <div className="flex items-center space-x-3 mb-6">
               <img 
                 src="/logos/LOGO QY Growth.png" 
-                alt="QY Growth Logo" 
+                alt="Ask Why? Growth Logo" 
                 className="w-12 h-12 object-contain"
               />
               <div>
                 <span className="text-2xl font-bold text-white">
-                  QY Growth
+                  Ask Why? Growth
                 </span>
                 <div className="text-xs text-gray-400">AI Solutions</div>
               </div>
@@ -117,7 +117,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-4">
               <li className="flex items-center space-x-3">
                 <Mail className="w-5 h-5 text-white" />
-                <span className="text-gray-300">hello@qygrowth.com</span>
+                <span className="text-gray-300">hello@askwhygrowth.com</span>
               </li>
               <li className="flex items-center space-x-3">
                 <Phone className="w-5 h-5 text-white" />
@@ -153,7 +153,7 @@ const Footer: React.FC = () => {
         {/* Bottom Bar */}
         <div className="border-t border-gray-600 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            © 2025 QY Growth. All rights reserved. | Powered by AI Innovation
+            © 2025 Ask Why? Growth. All rights reserved. | Powered by AI Innovation
           </p>
           <div className="flex items-center space-x-6 mt-4 md:mt-0">
             <span className="text-gray-400 text-sm">🔒 Enterprise-grade security</span>
