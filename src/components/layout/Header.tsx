@@ -42,7 +42,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
             <Link to="/" className="flex items-center space-x-3 group">
               <div className="relative">
                 <img 
-                  src={!isScrolled && location.pathname === '/' ? "/logos/SystemAQ-logo(w).png" : "/logos/SystemAQ-logo.png"} 
+                  src="/logos/qy-growth-logo.png" 
                   alt="QY Growth Logo" 
                   className="w-12 h-12 object-contain group-hover:scale-110 transition-transform duration-300"
                 />

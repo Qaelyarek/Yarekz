@@ -111,7 +111,7 @@ const LeadCapture: React.FC<LeadCaptureProps> = ({
       <div className="text-center mb-8">
         <div className="flex items-center justify-center mb-4">
           <img 
-            src="/logos/SystemAQ-logo.png" 
+            src="/logos/qy-growth-logo.png" 
             alt="QY Growth Logo" 
             className="w-12 h-12 object-contain"
           />
