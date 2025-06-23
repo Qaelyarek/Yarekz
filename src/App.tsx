@@ -6,20 +6,7 @@ import VAPIDemo from './components/VAPIDemo';
 import AIPhoneHero from './components/hero/AIPhoneHero';
 import EnhancedAIPhoneHero from './components/hero/EnhancedAIPhoneHero';
 import VAPIPhoneInterface from './components/ai/VAPIPhoneInterface';
-import AIPhoneCaller from './components/ai/AIPhoneCaller';
 import { validateRequiredEnvVars, isDevelopment } from './config/environment';
-import { 
-  TrendingUp, 
-  Users, 
-  Target, 
-  Star,
-  CheckCircle,
-  Clock,
-  DollarSign,
-  Shield,
-  Zap,
-  Bot
-} from 'lucide-react';
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
