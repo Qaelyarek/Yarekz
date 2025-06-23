@@ -1,16 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  Phone, 
-  PhoneOff, 
-  Mic, 
-  MicOff, 
-  Volume2, 
-  VolumeX,
-  MessageSquare,
-  Send,
-  Loader2,
-  AlertCircle
-} from 'lucide-react';
 import VAPIService from '../../ai-services/vapi-official';
 import VoiceWaveform from './VoiceWaveform';
 import type { VAPIMessage, VAPIMetrics } from '../../ai-services/vapi-official';
