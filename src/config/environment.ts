@@ -11,6 +11,10 @@ interface EnvironmentConfig {
   azureSpeechKey: string;
   azureSpeechRegion: string;
   
+  // VAPI Voice Integration
+  vapiAssistantId: string;
+  vapiPublicKey: string;
+  
   // Analytics
   googleAnalyticsId: string;
   facebookPixelId: string;
@@ -47,6 +51,10 @@ export const env: EnvironmentConfig = {
   azureSpeechKey: getEnvVar('VITE_AZURE_SPEECH_KEY'),
   azureSpeechRegion: getEnvVar('VITE_AZURE_SPEECH_REGION'),
   
+  // VAPI Voice Integration
+  vapiAssistantId: getEnvVar('VITE_VAPI_ASSISTANT_ID'),
+  vapiPublicKey: getEnvVar('VITE_VAPI_PUBLIC_KEY'),
+  
   // Analytics
   googleAnalyticsId: getEnvVar('VITE_GOOGLE_ANALYTICS_ID'),
   facebookPixelId: getEnvVar('VITE_FACEBOOK_PIXEL_ID'),
@@ -67,3 +75,18 @@ export const env: EnvironmentConfig = {
 export const isDevelopment = env.appEnv === 'development';
 export const isProduction = env.appEnv === 'production';
 export const isStaging = env.appEnv === 'staging';
+
+// Validation helper
+export const validateRequiredEnvVars = () => {
+  const requiredForProduction = [
+    'VITE_SUPABASE_URL',
+    'VITE_SUPABASE_ANON_KEY',
+  ];
+
+  if (isProduction) {
+    const missing = requiredForProduction.filter(key => !getEnvVar(key));
+    if (missing.length > 0) {
+      throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+    }
+  }
+};
