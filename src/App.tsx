@@ -8,6 +8,8 @@ import VAPIDemo from './components/VAPIDemo';
 import AIPhoneHero from './components/hero/AIPhoneHero';
 import EnhancedAIPhoneHero from './components/hero/EnhancedAIPhoneHero';
 import VAPIPhoneInterface from './components/ai/VAPIPhoneInterface';
+import PulsingCallButton from './components/ui/PulsingCallButton';
+import VAPIService from './ai-services/vapi-official';
 import FeaturesPage from './pages/FeaturesPage';
 import AISolutionsPage from './pages/AISolutionsPage';
 import AboutPage from './pages/AboutPage';
@@ -150,14 +152,28 @@ const HomePage: React.FC = () => {
   );
 };
 
-// Minimalist CEO-Focused Funnel Page (keeping existing functionality)
+// Minimalist CEO-Focused Funnel Page with enhanced call button
 const MinimalistCEOFunnel: React.FC = () => {
-  const handleAIConnect = () => {
-    console.log('✅ AI Phone Caller connection initiated');
-  };
+  const [callState, setCallState] = useState(VAPIService.getCallState());
 
-  const handleAIDisconnect = () => {
-    console.log('📞 AI Phone Caller disconnected');
+  useEffect(() => {
+    const handleCallStateChanged = (newCallState: any) => {
+      setCallState(newCallState);
+    };
+
+    VAPIService.on('call-state-changed', handleCallStateChanged);
+    
+    return () => {
+      VAPIService.off('call-state-changed', handleCallStateChanged);
+    };
+  }, []);
+
+  const handleCallToggle = async () => {
+    if (callState.inCall) {
+      await VAPIService.endCall();
+    } else {
+      await VAPIService.startCall();
+    }
   };
 
   return (
@@ -260,7 +276,7 @@ const MinimalistCEOFunnel: React.FC = () => {
         </div>
       </section>
 
-      {/* CTA Section with VAPI Interface */}
+      {/* CTA Section with Enhanced Pulsing Call Button */}
       <section className="bg-white text-black py-20 lg:py-32 border-t-4 border-black">
         <div className="max-w-6xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
@@ -271,13 +287,19 @@ const MinimalistCEOFunnel: React.FC = () => {
             Join 500+ CEOs who've automated their appointment setting with AI.
           </p>
           
-          <div className="mb-12 max-w-md mx-auto">
-            <VAPIPhoneInterface
-              showTranscript={false}
-              allowTextInput={false}
-              debugMode={false}
-              onCallStart={handleAIConnect}
-              onCallEnd={handleAIDisconnect}
+          {/* Enhanced Pulsing Call Button */}
+          <div className="mb-12">
+            <PulsingCallButton
+              isActive={callState.inCall}
+              isConnecting={callState.isConnecting}
+              onToggle={handleCallToggle}
+              size="lg"
+              statusText={
+                callState.isConnecting ? "Connecting to AI..." :
+                callState.inCall ? `Call in progress (${VAPIService.formatCallDuration()})` :
+                "Talk to our AI agent now"
+              }
+              className="mx-auto"
             />
           </div>
 
