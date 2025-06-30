@@ -40,20 +40,37 @@ function App() {
           
           <main>
             <Routes>
+              {/* Main Pages - SEO Optimized URLs */}
               <Route path="/" element={<HomePage />} />
-              <Route path="/features" element={<FeaturesPage />} />
+              <Route path="/ai-appointment-setting" element={<HomePage />} />
+              <Route path="/ai-features" element={<FeaturesPage />} />
               <Route path="/ai-solutions" element={<AISolutionsPage />} />
+              <Route path="/business-funding-ai" element={<AISolutionsPage />} />
+              <Route path="/ecommerce-automation" element={<AISolutionsPage />} />
+              <Route path="/business-coaching-ai" element={<AISolutionsPage />} />
+              <Route path="/about-us" element={<AboutPage />} />
+              <Route path="/contact-us" element={<ContactPage />} />
+              <Route path="/schedule-demo" element={<ContactPage />} />
+              
+              {/* Demo and Interactive Pages */}
+              <Route path="/ai-voice-demo" element={<VAPIDemo />} />
+              <Route path="/ai-assistant-demo" element={<AIPhoneHero />} />
+              <Route path="/voice-interface-demo" element={<InterfaceDemo />} />
+              <Route path="/ai-phone-interface" element={<EnhancedAIPhoneHero />} />
+              
+              {/* Legal Pages */}
+              <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+              <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+              <Route path="/disclaimer" element={<DisclaimerPage />} />
+              
+              {/* Legacy Redirects - Keep for backward compatibility */}
+              <Route path="/features" element={<FeaturesPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/vapi-demo" element={<VAPIDemo />} />
               <Route path="/hero-demo" element={<AIPhoneHero />} />
               <Route path="/enhanced-hero" element={<EnhancedAIPhoneHero />} />
               <Route path="/interface-demo" element={<InterfaceDemo />} />
-              
-              {/* Legal Pages */}
-              <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-              <Route path="/terms-of-service" element={<TermsOfServicePage />} />
-              <Route path="/disclaimer" element={<DisclaimerPage />} />
             </Routes>
           </main>
 
@@ -71,10 +88,10 @@ const InterfaceDemo: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            VAPI Interface Demo
+            AI Voice Interface Demo
           </h1>
           <p className="text-xl text-gray-600">
-            Test the official VAPI Web SDK integration
+            Test our advanced AI voice assistant with real-time conversations
           </p>
         </div>
 
@@ -89,28 +106,28 @@ const InterfaceDemo: React.FC = () => {
           
           <div className="space-y-6">
             <div className="bg-white rounded-lg p-6 border">
-              <h3 className="text-lg font-semibold mb-4">Features Demonstrated:</h3>
+              <h3 className="text-lg font-semibold mb-4">AI Voice Features:</h3>
               <ul className="space-y-2 text-gray-600">
-                <li>✅ Official VAPI Web SDK integration</li>
-                <li>✅ Real-time voice conversations</li>
-                <li>✅ Live transcript display</li>
-                <li>✅ Voice visualization</li>
-                <li>✅ Mute/unmute controls</li>
-                <li>✅ Text message support</li>
-                <li>✅ Error handling</li>
-                <li>✅ Debug information</li>
+                <li>✅ Natural conversation AI</li>
+                <li>✅ Real-time voice processing</li>
+                <li>✅ Multi-language support</li>
+                <li>✅ Business context awareness</li>
+                <li>✅ Lead qualification automation</li>
+                <li>✅ Appointment scheduling</li>
+                <li>✅ CRM integration ready</li>
+                <li>✅ 24/7 availability</li>
               </ul>
             </div>
 
             <div className="bg-white rounded-lg p-6 border">
-              <h3 className="text-lg font-semibold mb-4">SDK Benefits:</h3>
+              <h3 className="text-lg font-semibold mb-4">Perfect For:</h3>
               <ul className="space-y-2 text-gray-600">
-                <li>🚀 Latest VAPI Web SDK features</li>
-                <li>🔧 TypeScript support</li>
-                <li>📱 Mobile-responsive design</li>
-                <li>🎯 Production-ready code</li>
-                <li>🔒 Secure credential handling</li>
-                <li>📊 Comprehensive event handling</li>
+                <li>🎯 CEO appointment setting</li>
+                <li>🏦 Business funding inquiries</li>
+                <li>🛒 Ecommerce customer support</li>
+                <li>📈 Business coaching intake</li>
+                <li>📞 Lead qualification calls</li>
+                <li>📅 Calendar management</li>
               </ul>
             </div>
           </div>

@@ -45,10 +45,10 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
 
   const navItems = [
     { name: 'Home', path: '/' },
-    { name: 'Features', path: '/features' },
+    { name: 'AI Features', path: '/ai-features' },
     { name: 'AI Solutions', path: '/ai-solutions' },
-    { name: 'About', path: '/about' },
-    { name: 'Contact', path: '/contact' },
+    { name: 'About Us', path: '/about-us' },
+    { name: 'Contact', path: '/contact-us' },
   ];
 
   return (
@@ -65,7 +65,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
               <div className="relative">
                 <img 
                   src="/logos/LOGO QY Growth.png" 
-                  alt="Ask Why? Growth Logo" 
+                  alt="Ask Why? Growth - AI Appointment Setting for CEOs" 
                   className="w-12 h-12 object-contain group-hover:scale-110 transition-transform duration-300"
                 />
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
@@ -113,18 +113,17 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
 
           {/* Action Buttons */}
           <div className="hidden lg:flex items-center space-x-4">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className={`${
+            <Link 
+              to="/schedule-demo"
+              className={`inline-flex items-center px-4 py-2 border-2 rounded-lg font-medium transition-all duration-300 ${
                 !isScrolled && location.pathname === '/' 
                   ? 'text-white border-white hover:bg-white hover:text-black' 
                   : 'text-black border-black hover:bg-black hover:text-white'
-              } border-2`}
+              }`}
             >
               <MessageCircle className="w-4 h-4 mr-2" />
-              Chat
-            </Button>
+              Schedule Demo
+            </Link>
             
             <Button 
               variant="primary" 
@@ -138,7 +137,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
               } border-0 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               <Phone className={`w-4 h-4 mr-2 ${isConnecting ? 'animate-pulse' : ''}`} />
-              {isConnecting ? 'Connecting...' : 'Call AI'}
+              {isConnecting ? 'Connecting...' : 'Talk to AI'}
             </Button>
           </div>
 
@@ -183,14 +182,18 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
                 className="w-full mb-3 bg-black text-white disabled:opacity-50"
               >
                 <Phone className={`w-4 h-4 mr-2 ${isConnecting ? 'animate-pulse' : ''}`} />
-                {isConnecting ? 'Connecting...' : 'Call AI Agent'}
+                {isConnecting ? 'Connecting...' : 'Talk to AI Assistant'}
               </Button>
               
               <div className="flex space-x-3">
-                <Button variant="ghost" size="sm" className="flex-1 border-2 border-black text-black">
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  Chat
-                </Button>
+                <Link
+                  to="/schedule-demo"
+                  className="flex-1 text-center px-4 py-2 border-2 border-black text-black rounded-lg font-medium hover:bg-black hover:text-white transition-all duration-300"
+                  onClick={onMenuToggle}
+                >
+                  <MessageCircle className="w-4 h-4 mr-2 inline" />
+                  Schedule Demo
+                </Link>
                 <Button 
                   variant="ghost" 
                   size="sm" 
@@ -199,7 +202,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
                   className="flex-1 border-2 border-black text-black disabled:opacity-50"
                 >
                   <Phone className={`w-4 h-4 mr-2 ${isConnecting ? 'animate-pulse' : ''}`} />
-                  Call
+                  Call AI
                 </Button>
               </div>
             </div>

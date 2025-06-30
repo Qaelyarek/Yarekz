@@ -55,8 +55,8 @@ const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/features" className="text-gray-300 hover:text-white transition-colors duration-300">
-                  Features
+                <Link to="/ai-features" className="text-gray-300 hover:text-white transition-colors duration-300">
+                  AI Features
                 </Link>
               </li>
               <li>
@@ -65,23 +65,48 @@ const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/about" className="text-gray-300 hover:text-white transition-colors duration-300">
-                  About Us
+                <Link to="/business-funding-ai" className="text-gray-300 hover:text-white transition-colors duration-300">
+                  Business Funding AI
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-gray-300 hover:text-white transition-colors duration-300">
-                  Contact
+                <Link to="/ecommerce-automation" className="text-gray-300 hover:text-white transition-colors duration-300">
+                  Ecommerce Automation
+                </Link>
+              </li>
+              <li>
+                <Link to="/business-coaching-ai" className="text-gray-300 hover:text-white transition-colors duration-300">
+                  Business Coaching AI
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Legal */}
+          {/* Company Pages */}
           <div>
-            <h3 className="text-lg font-semibold mb-6 text-white">Legal</h3>
+            <h3 className="text-lg font-semibold mb-6 text-white">Company</h3>
             <div className="w-12 h-0.5 bg-white mb-6"></div>
             <ul className="space-y-4">
+              <li>
+                <Link to="/about-us" className="text-gray-300 hover:text-white transition-colors duration-300">
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact-us" className="text-gray-300 hover:text-white transition-colors duration-300">
+                  Contact Us
+                </Link>
+              </li>
+              <li>
+                <Link to="/schedule-demo" className="text-gray-300 hover:text-white transition-colors duration-300">
+                  Schedule Demo
+                </Link>
+              </li>
+              <li>
+                <Link to="/ai-voice-demo" className="text-gray-300 hover:text-white transition-colors duration-300">
+                  Try AI Voice Demo
+                </Link>
+              </li>
               <li>
                 <Link to="/privacy-policy" className="text-gray-300 hover:text-white transition-colors duration-300">
                   Privacy Policy
@@ -96,16 +121,6 @@ const Footer: React.FC = () => {
                 <Link to="/disclaimer" className="text-gray-300 hover:text-white transition-colors duration-300">
                   Disclaimer
                 </Link>
-              </li>
-              <li>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors duration-300">
-                  Security
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors duration-300">
-                  Compliance
-                </a>
               </li>
             </ul>
           </div>
