@@ -8,7 +8,7 @@ import VAPIDemo from './components/VAPIDemo';
 import AIPhoneHero from './components/hero/AIPhoneHero';
 import EnhancedAIPhoneHero from './components/hero/EnhancedAIPhoneHero';
 import VAPIPhoneInterface from './components/ai/VAPIPhoneInterface';
-import PulsingCallButton from './components/ui/PulsingCallButton';
+import ProfessionalCallInterface from './components/ui/ProfessionalCallInterface';
 import VAPIService from './ai-services/vapi-official';
 import FeaturesPage from './pages/FeaturesPage';
 import AISolutionsPage from './pages/AISolutionsPage';
@@ -152,7 +152,7 @@ const HomePage: React.FC = () => {
   );
 };
 
-// Minimalist CEO-Focused Funnel Page with enhanced call button
+// Minimalist CEO-Focused Funnel Page with enhanced professional call interface
 const MinimalistCEOFunnel: React.FC = () => {
   const [callState, setCallState] = useState(VAPIService.getCallState());
 
@@ -168,11 +168,25 @@ const MinimalistCEOFunnel: React.FC = () => {
     };
   }, []);
 
-  const handleCallToggle = async () => {
-    if (callState.inCall) {
-      await VAPIService.endCall();
-    } else {
-      await VAPIService.startCall();
+  const handleCallAccept = async () => {
+    try {
+      const result = await VAPIService.startCall();
+      if (!result.success) {
+        console.error('Failed to start call:', result.message);
+      }
+    } catch (error) {
+      console.error('Error starting call:', error);
+    }
+  };
+
+  const handleCallEnd = async () => {
+    try {
+      const result = await VAPIService.endCall();
+      if (!result.success) {
+        console.error('Failed to end call:', result.message);
+      }
+    } catch (error) {
+      console.error('Error ending call:', error);
     }
   };
 
@@ -276,7 +290,7 @@ const MinimalistCEOFunnel: React.FC = () => {
         </div>
       </section>
 
-      {/* CTA Section with Enhanced Pulsing Call Button */}
+      {/* CTA Section with Professional Call Interface */}
       <section className="bg-white text-black py-20 lg:py-32 border-t-4 border-black">
         <div className="max-w-6xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
@@ -287,15 +301,15 @@ const MinimalistCEOFunnel: React.FC = () => {
             Join 500+ CEOs who've automated their appointment setting with AI.
           </p>
           
-          {/* Enhanced Pulsing Call Button */}
+          {/* Professional Call Interface - Minimalist Black & White Design */}
           <div className="mb-12">
-            <PulsingCallButton
+            <ProfessionalCallInterface
               isActive={callState.inCall}
               isConnecting={callState.isConnecting}
-              onToggle={handleCallToggle}
-              size="lg"
+              onAccept={handleCallAccept}
+              onEnd={handleCallEnd}
               statusText={
-                callState.isConnecting ? "Connecting to AI..." :
+                callState.isConnecting ? "Connecting to AI agent..." :
                 callState.inCall ? `Call in progress (${VAPIService.formatCallDuration()})` :
                 "Talk to our AI agent now"
               }

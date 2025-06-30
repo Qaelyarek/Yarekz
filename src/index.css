@@ -44,6 +44,49 @@
     @apply bg-white/10 backdrop-blur-lg border border-white/20;
   }
 
+  /* Professional Call Interface - Minimalist Black & White */
+  .professional-call-button {
+    @apply relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, box-shadow;
+  }
+
+  .professional-call-button:hover {
+    transform: scale(1.1);
+  }
+
+  .professional-call-button:active {
+    transform: scale(0.95);
+    transition-duration: 0.1s;
+  }
+
+  .professional-call-button.accepting {
+    @apply bg-white border-black text-black;
+  }
+
+  .professional-call-button.accepting:hover {
+    @apply bg-black text-white;
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .professional-call-button.ending {
+    @apply bg-black border-black text-white;
+  }
+
+  .professional-call-button.ending:hover {
+    @apply bg-red-600 border-red-600;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
+  }
+
+  .professional-call-button.active {
+    animation: professional-call-pulse 2s ease-in-out infinite;
+  }
+
+  /* Border width utility for thicker borders */
+  .border-3 {
+    border-width: 3px;
+  }
+
   /* VAPI Call Button Animations - Enhanced & Consistent */
   .vapi-call-button,
   [data-vapi-call="true"] {
@@ -186,6 +229,18 @@
     [data-vapi-call="true"].active {
       animation: none;
     }
+
+    .professional-call-button {
+      transition: box-shadow 0.3s ease-in-out;
+    }
+
+    .professional-call-button:hover {
+      transform: none;
+    }
+
+    .professional-call-button.active {
+      animation: none;
+    }
   }
 
   /* High contrast mode support */
@@ -198,6 +253,10 @@
     .vapi-call-button.connecting,
     [data-vapi-call="true"].connecting {
       border: 2px solid currentColor;
+    }
+
+    .professional-call-button {
+      border-width: 4px;
     }
   }
 
@@ -255,6 +314,38 @@
   }
   to {
     box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
+  }
+}
+
+/* Professional Call Interface Animations */
+@keyframes professional-call-pulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 0 0 rgba(239, 68, 68, 0.4),
+      0 0 20px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    box-shadow: 
+      0 0 0 10px rgba(239, 68, 68, 0),
+      0 0 30px rgba(0, 0, 0, 0.2);
+  }
+}
+
+@keyframes professional-accept-hover {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.1);
+  }
+  100% {
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+@keyframes professional-end-hover {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
   }
 }
 
