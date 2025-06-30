@@ -12,6 +12,7 @@ import ProfessionalCallInterface from './components/ui/ProfessionalCallInterface
 import SquadAgentDemo from './components/demo/SquadAgentDemo';
 import CallTerminationDemo from './components/demo/CallTerminationDemo';
 import CallTerminationButton from './components/ui/CallTerminationButton';
+import VAPICallDemo from './pages/VAPICallDemo';
 import VAPIService from './ai-services/vapi-official';
 import FeaturesPage from './pages/FeaturesPage';
 import AISolutionsPage from './pages/AISolutionsPage';
@@ -64,6 +65,7 @@ function App() {
               <Route path="/ai-phone-interface" element={<EnhancedAIPhoneHero />} />
               <Route path="/squad-agent-demo" element={<SquadAgentDemo />} />
               <Route path="/call-termination-demo" element={<CallTerminationDemo />} />
+              <Route path="/vapi-call-demo" element={<VAPICallDemo />} />
               
               {/* Legal Pages */}
               <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
