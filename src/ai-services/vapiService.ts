@@ -1,6 +1,6 @@
 import { createVapi } from '@vapi-ai/web';
 
-const vapi = createVapi(import.meta.env.VITE_VAPI_PUBLIC_KEY); // ✅ pass key directly as string
+const vapi = createVapi(import.meta.env.VITE_VAPI_PUBLIC_KEY);
 
 type AgentType = 'max' | 'grace' | 'kyle' | 'squad';
 
@@ -14,7 +14,7 @@ const agentMap: Record<AgentType, string> = {
 function setAssistant(agent: AgentType): void {
   const agentId = agentMap[agent];
   if (!agentId) throw new Error(`Invalid agent name: ${agent}`);
-  vapi.set({ agentId }); // ✅ this is valid for v2 only
+  vapi.set({ agentId });
 }
 
 export { vapi, setAssistant };
