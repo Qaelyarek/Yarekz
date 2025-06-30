@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Phone, PhoneOff, Users, AlertTriangle, Loader2 } from 'lucide-react';
+import { PhoneOff, Users, AlertTriangle, Loader2 } from 'lucide-react';
 import { cn } from '../../utils';
 import { setAssistant } from '../../ai-services/vapiService';
 import VAPIService from '../../ai-services/vapi-official';

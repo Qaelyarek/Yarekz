@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Phone, PhoneOff, Mic, MicOff, Loader2, MessageSquare, Send, AlertCircle, Clock, X, CheckCircle } from 'lucide-react';
+import { Phone, PhoneOff, Mic, MicOff, Loader2, MessageSquare, Send, AlertCircle, Clock } from 'lucide-react';
 import VAPIService from '../../ai-services/vapi-official';
 import VoiceWaveform from './VoiceWaveform';
 import type { VAPIMessage, VAPIMetrics, VAPICallState } from '../../ai-services/vapi-official';

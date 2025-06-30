@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { PhoneOff } from 'lucide-react';
 import { cn } from '../../utils';
 
