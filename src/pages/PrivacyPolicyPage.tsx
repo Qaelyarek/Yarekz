@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Shield, Eye, Lock, Globe, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Shield, Lock, AlertCircle } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
 const PrivacyPolicyPage: React.FC = () => {

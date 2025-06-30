@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, FileText, Scale, AlertCircle, Shield } from 'lucide-react';
+import { ArrowLeft, FileText, AlertCircle } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
 const TermsOfServicePage: React.FC = () => {
