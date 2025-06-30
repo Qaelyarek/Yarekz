@@ -22,14 +22,30 @@ export interface VAPIMetrics {
   duration?: number;
 }
 
+export interface VAPICallState {
+  inCall: boolean;
+  isConnecting: boolean;
+  callDuration: number;
+  callStartTime?: Date;
+}
+
 class VAPIService {
   private vapi: Vapi | null = null;
   private assistantId: string;
   private publicKey: string;
   private isInitialized: boolean = false;
-  private isConnected: boolean = false;
   private eventListeners: Map<string, Function[]> = new Map();
   private metrics: VAPIMetrics = {};
+  
+  // Call state management
+  private callState: VAPICallState = {
+    inCall: false,
+    isConnecting: false,
+    callDuration: 0,
+    callStartTime: undefined,
+  };
+  
+  private callTimer: NodeJS.Timeout | null = null;
 
   constructor() {
     this.assistantId = env.vapiAssistantId;
@@ -63,19 +79,12 @@ class VAPIService {
   private setupEventListeners(): void {
     if (!this.vapi) return;
 
-    // Call lifecycle events
-    this.vapi.on('call-start', () => {
-      console.log('📞 Call started');
-      this.isConnected = true;
-      this.emitEvent('call-start');
-    });
-
-    this.vapi.on('call-end', () => {
-      console.log('📞 Call ended');
-      this.isConnected = false;
-      this.metrics = {};
-      this.emitEvent('call-end');
-    });
+    // Call lifecycle events - handle both old and new event names
+    this.vapi.on('call-start', () => this.handleCallStarted());
+    this.vapi.on('callStarted', () => this.handleCallStarted());
+    
+    this.vapi.on('call-end', () => this.handleCallEnded());
+    this.vapi.on('callEnded', () => this.handleCallEnded());
 
     // Speech and audio events
     this.vapi.on('speech-start', () => {
@@ -122,6 +131,59 @@ class VAPIService {
     console.log('🎧 VAPI event listeners configured');
   }
 
+  private handleCallStarted(): void {
+    console.log('📞 Call started - updating state');
+    
+    this.callState.inCall = true;
+    this.callState.isConnecting = false;
+    this.callState.callStartTime = new Date();
+    this.callState.callDuration = 0;
+    
+    // Start call duration timer
+    this.startCallTimer();
+    
+    this.emitEvent('call-start');
+    this.emitEvent('call-state-changed', this.callState);
+  }
+
+  private handleCallEnded(): void {
+    console.log('📞 Call ended - updating state');
+    
+    this.callState.inCall = false;
+    this.callState.isConnecting = false;
+    this.callState.callStartTime = undefined;
+    this.callState.callDuration = 0;
+    
+    // Stop call duration timer
+    this.stopCallTimer();
+    
+    // Reset metrics
+    this.metrics = {};
+    
+    this.emitEvent('call-end');
+    this.emitEvent('call-state-changed', this.callState);
+  }
+
+  private startCallTimer(): void {
+    this.stopCallTimer(); // Clear any existing timer
+    
+    this.callTimer = setInterval(() => {
+      if (this.callState.inCall && this.callState.callStartTime) {
+        this.callState.callDuration = Math.floor(
+          (Date.now() - this.callState.callStartTime.getTime()) / 1000
+        );
+        this.emitEvent('call-duration-updated', this.callState.callDuration);
+      }
+    }, 1000);
+  }
+
+  private stopCallTimer(): void {
+    if (this.callTimer) {
+      clearInterval(this.callTimer);
+      this.callTimer = null;
+    }
+  }
+
   // Event management
   private emitEvent(eventName: string, data?: any): void {
     const listeners = this.eventListeners.get(eventName) || [];
@@ -165,6 +227,10 @@ class VAPIService {
       console.log(`  Assistant ID: ${this.assistantId}`);
       console.log(`  Phone Number: ${phoneNumber || 'Web call (microphone)'}`);
 
+      // Update state to connecting
+      this.callState.isConnecting = true;
+      this.emitEvent('call-state-changed', this.callState);
+
       const callConfig: any = {};
 
       // Add phone number for outbound calls
@@ -182,6 +248,11 @@ class VAPIService {
       };
     } catch (error) {
       console.error('❌ Failed to start call:', error);
+      
+      // Reset connecting state on error
+      this.callState.isConnecting = false;
+      this.emitEvent('call-state-changed', this.callState);
+      
       return {
         success: false,
         message: `Failed to start call: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -256,21 +327,42 @@ class VAPIService {
 
   // Status and metrics
   public isCallActive(): boolean {
-    return this.isConnected;
+    return this.callState.inCall;
+  }
+
+  public isConnecting(): boolean {
+    return this.callState.isConnecting;
+  }
+
+  public getCallState(): VAPICallState {
+    return { ...this.callState };
   }
 
   public getMetrics(): VAPIMetrics {
     return { ...this.metrics };
   }
 
+  public getCallDuration(): number {
+    return this.callState.callDuration;
+  }
+
+  public formatCallDuration(): string {
+    const duration = this.callState.callDuration;
+    const minutes = Math.floor(duration / 60);
+    const seconds = duration % 60;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
   public getStatus() {
     return {
       initialized: this.isInitialized,
-      connected: this.isConnected,
+      connected: this.callState.inCall,
+      connecting: this.callState.isConnecting,
       assistantId: this.assistantId,
       publicKeyHash: this.publicKey ? `${this.publicKey.substring(0, 8)}...` : 'Not set',
       sdkLoaded: !!this.vapi,
       configValid: validateVAPIConfig(),
+      callState: this.callState,
     };
   }
 
@@ -299,6 +391,19 @@ class VAPIService {
       success: true,
       message: 'VAPI configuration is valid and ready.',
     };
+  }
+
+  // Cleanup
+  public destroy(): void {
+    this.stopCallTimer();
+    this.eventListeners.clear();
+    if (this.vapi) {
+      try {
+        this.vapi.stop();
+      } catch (error) {
+        console.error('Error stopping VAPI during cleanup:', error);
+      }
+    }
   }
 }
 
