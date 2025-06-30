@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Phone, PhoneOff, Mic, MicOff, Loader2, MessageSquare, Send, AlertCircle } from 'lucide-react';
 import VAPIService from '../../ai-services/vapi-official';
 import VoiceWaveform from './VoiceWaveform';
-import { vapi } from '../ai-services/vapiService';
+import { setAssistant } from '../../ai-services/vapiService';
 import type { VAPIMessage, VAPIMetrics } from '../../ai-services/vapi-official';
 
 interface VAPIPhoneInterfaceProps {
@@ -141,7 +141,7 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
 
     try {
       // Use the new vapi service to start call with 'max' agent
-      vapi.start('max');
+      setAssistant('max');
     } catch (error) {
       console.error('Failed to start call:', error);
       setError('Failed to connect. Please try again.');
