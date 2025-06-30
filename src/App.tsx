@@ -10,6 +10,8 @@ import EnhancedAIPhoneHero from './components/hero/EnhancedAIPhoneHero';
 import VAPIPhoneInterface from './components/ai/VAPIPhoneInterface';
 import ProfessionalCallInterface from './components/ui/ProfessionalCallInterface';
 import SquadAgentDemo from './components/demo/SquadAgentDemo';
+import CallTerminationDemo from './components/demo/CallTerminationDemo';
+import CallTerminationButton from './components/ui/CallTerminationButton';
 import VAPIService from './ai-services/vapi-official';
 import FeaturesPage from './pages/FeaturesPage';
 import AISolutionsPage from './pages/AISolutionsPage';
@@ -61,6 +63,7 @@ function App() {
               <Route path="/voice-interface-demo" element={<InterfaceDemo />} />
               <Route path="/ai-phone-interface" element={<EnhancedAIPhoneHero />} />
               <Route path="/squad-agent-demo" element={<SquadAgentDemo />} />
+              <Route path="/call-termination-demo" element={<CallTerminationDemo />} />
               
               {/* Legal Pages */}
               <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
@@ -292,8 +295,8 @@ const MinimalistCEOFunnel: React.FC = () => {
         </div>
       </section>
 
-      {/* CTA Section with Professional Call Interface */}
-      <section className="bg-white text-black py-20 lg:py-32 border-t-4 border-black">
+      {/* CTA Section with Professional Call Interface and Call Termination Button */}
+      <section className="bg-white text-black py-20 lg:py-32 border-t-4 border-black relative">
         <div className="max-w-6xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
             Ready to 10X Your Appointments?
@@ -333,6 +336,14 @@ const MinimalistCEOFunnel: React.FC = () => {
             ))}
           </div>
         </div>
+
+        {/* Call Termination Button - Positioned prominently when call is active */}
+        <CallTerminationButton
+          visible={callState.inCall}
+          onEndCall={handleCallEnd}
+          showToast={true}
+          position="center-bottom"
+        />
       </section>
     </div>
   );

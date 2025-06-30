@@ -44,6 +44,53 @@
     @apply bg-white/10 backdrop-blur-lg border border-white/20;
   }
 
+  /* Call Termination Button Styles */
+  .call-termination-button {
+    @apply relative w-16 h-16 rounded-full flex items-center justify-center;
+    @apply transition-all duration-200 ease-in-out;
+    @apply focus:outline-none focus:ring-4 focus:ring-red-300 focus:ring-offset-2;
+    @apply select-none cursor-pointer;
+    
+    /* Exact color specification */
+    background-color: #FF3B30;
+    
+    /* Exact shadow specification */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    
+    /* Minimum touch target */
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  .call-termination-button:hover {
+    background-color: #FF2D1F;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25);
+  }
+  
+  .call-termination-button:active,
+  .call-termination-button.pressed {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  
+  .call-termination-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .call-termination-button:disabled:hover {
+    background-color: #FF3B30;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    transform: none;
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .call-termination-button {
+      border: 2px solid white;
+    }
+  }
+
   /* Professional Call Interface - Minimalist Black & White */
   .professional-call-button {
     @apply relative;
@@ -240,6 +287,15 @@
 
     .professional-call-button.active {
       animation: none;
+    }
+
+    .call-termination-button {
+      transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+
+    .call-termination-button:active,
+    .call-termination-button.pressed {
+      transform: none;
     }
   }
 
