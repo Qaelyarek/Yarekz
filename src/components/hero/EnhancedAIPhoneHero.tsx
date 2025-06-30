@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, Mic, Volume2, Shield, Zap, Clock } from 'lucide-react';
+import { Phone, Mic, Volume2, Shield, Zap, Clock, PhoneOff } from 'lucide-react';
 import StarBorder from '../ui/star-border';
 import VAPIPhoneInterface from '../ai/VAPIPhoneInterface';
+import VAPIService from '../../ai-services/vapi-official';
 import { validateVAPIConfig, isDevelopment } from '../../config/environment';
 
 interface EnhancedAIPhoneHeroProps {
@@ -14,14 +15,49 @@ const EnhancedAIPhoneHero: React.FC<EnhancedAIPhoneHeroProps> = ({
   const [isVisible, setIsVisible] = useState(false);
   const [showInterface, setShowInterface] = useState(false);
   const [isConfigValid, setIsConfigValid] = useState(false);
+  const [callState, setCallState] = useState(VAPIService.getCallState());
 
   useEffect(() => {
     setIsVisible(true);
     setIsConfigValid(validateVAPIConfig());
   }, []);
 
-  const handleStartDemo = () => {
-    setShowInterface(true);
+  // Monitor call state changes
+  useEffect(() => {
+    const handleCallStateChanged = (newCallState: any) => {
+      setCallState(newCallState);
+    };
+
+    VAPIService.on('call-state-changed', handleCallStateChanged);
+    setCallState(VAPIService.getCallState());
+    
+    return () => {
+      VAPIService.off('call-state-changed', handleCallStateChanged);
+    };
+  }, []);
+
+  const handleStartDemo = async () => {
+    if (!isConfigValid) return;
+    
+    if (callState.inCall || callState.isConnecting) {
+      // If in call, end it immediately
+      await VAPIService.endCall();
+      setShowInterface(false);
+    } else {
+      // If not in call, start demo
+      setShowInterface(true);
+    }
+  };
+
+  const handleEndCall = async () => {
+    try {
+      console.log('🔴 HERO: Ending call immediately...');
+      await VAPIService.endCall();
+      setShowInterface(false);
+      console.log('✅ HERO: Call ended successfully');
+    } catch (error) {
+      console.error('❌ HERO: Failed to end call:', error);
+    }
   };
 
   const stats = [
@@ -48,6 +84,17 @@ const EnhancedAIPhoneHero: React.FC<EnhancedAIPhoneHeroProps> = ({
     },
   ];
 
+  const getButtonText = () => {
+    if (callState.isConnecting) return 'Connecting...';
+    if (callState.inCall) return 'End Call';
+    return 'Start Voice Demo';
+  };
+
+  const getButtonIcon = () => {
+    if (callState.inCall) return PhoneOff;
+    return Phone;
+  };
+
   return (
     <section className={`relative min-h-screen bg-white overflow-hidden ${className}`}>
       {/* Background Pattern */}
@@ -69,8 +116,12 @@ const EnhancedAIPhoneHero: React.FC<EnhancedAIPhoneHeroProps> = ({
           }`}>
             {/* Badge */}
             <div className="inline-flex items-center px-4 py-2 bg-black text-white rounded-full text-sm font-medium mb-8">
-              <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse" />
-              Live AI Assistant
+              <div className={`w-2 h-2 rounded-full mr-2 ${
+                callState.inCall ? 'bg-red-400 animate-pulse' : 
+                callState.isConnecting ? 'bg-yellow-400 animate-pulse' : 
+                'bg-green-400 animate-pulse'
+              }`} />
+              {callState.inCall ? 'Call Active' : callState.isConnecting ? 'Connecting' : 'Live AI Assistant'}
             </div>
 
             {/* Headline */}
@@ -102,7 +153,7 @@ const EnhancedAIPhoneHero: React.FC<EnhancedAIPhoneHeroProps> = ({
               ))}
             </div>
 
-            {/* CTA Button */}
+            {/* CTA Button - WORKING CALL TERMINATION */}
             <div className="mb-8">
               {!isConfigValid ? (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
@@ -120,12 +171,14 @@ const EnhancedAIPhoneHero: React.FC<EnhancedAIPhoneHeroProps> = ({
                 <StarBorder
                   onClick={handleStartDemo}
                   speed="medium"
-                  className="text-xl hover:scale-105 transition-transform duration-300 vapi-call-button"
+                  className={`text-xl hover:scale-105 transition-transform duration-300 vapi-call-button ${
+                    callState.inCall ? 'bg-red-600 border-red-600 text-white' : ''
+                  }`}
                   data-vapi-call="true"
                 >
                   <div className="flex items-center space-x-3">
-                    <Phone className="w-6 h-6" />
-                    <span>Start Voice Demo</span>
+                    {React.createElement(getButtonIcon(), { className: "w-6 h-6" })}
+                    <span>{getButtonText()}</span>
                   </div>
                 </StarBorder>
               )}
@@ -149,14 +202,33 @@ const EnhancedAIPhoneHero: React.FC<EnhancedAIPhoneHeroProps> = ({
             isVisible ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'
           }`}>
             {showInterface ? (
-              <VAPIPhoneInterface
-                showTranscript={true}
-                allowTextInput={false}
-                debugMode={isDevelopment}
-                className="w-full max-w-md mx-auto"
-                onCallStart={() => console.log('Demo call started')}
-                onCallEnd={() => console.log('Demo call ended')}
-              />
+              <div className="relative">
+                <VAPIPhoneInterface
+                  showTranscript={true}
+                  allowTextInput={false}
+                  debugMode={isDevelopment}
+                  className="w-full max-w-md mx-auto"
+                  onCallStart={() => console.log('Demo call started')}
+                  onCallEnd={() => setShowInterface(false)}
+                />
+                
+                {/* PROMINENT END CALL BUTTON - ALWAYS WORKS */}
+                {callState.inCall && (
+                  <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
+                    <button
+                      onClick={handleEndCall}
+                      className="w-16 h-16 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center group"
+                      aria-label="End call immediately"
+                    >
+                      <PhoneOff className="w-8 h-8 group-hover:scale-110 transition-transform" />
+                      <div className="absolute -inset-2 border-2 border-red-400 rounded-full animate-ping opacity-75"></div>
+                    </button>
+                    <div className="text-center mt-2 text-sm font-medium text-red-600">
+                      End Call
+                    </div>
+                  </div>
+                )}
+              </div>
             ) : (
               <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-8 text-white">
                 <div className="text-center mb-8">
