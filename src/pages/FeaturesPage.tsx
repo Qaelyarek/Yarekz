@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Zap, Brain, MessageSquare, BarChart3, Shield, Clock, Users, Target, CheckCircle, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Zap, Brain, MessageSquare, BarChart3, Shield, Users, Target, CheckCircle, ArrowRight } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import VAPIPhoneInterface from '../components/ai/VAPIPhoneInterface';
 import { isDevelopment } from '../config/environment';
