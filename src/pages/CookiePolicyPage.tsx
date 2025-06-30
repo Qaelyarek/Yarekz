@@ -367,10 +367,10 @@ const CookiePolicyPage: React.FC = () => {
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">6.3 Opt-Out Tools</h3>
                 <p className="text-gray-700 mb-4">You can opt out of specific tracking services:</p>
                 <ul className="list-disc pl-6 space-y-2 text-gray-700 mb-6">
-                  <li><strong>Google Analytics:</strong> <a href="https://tools.google.com/dlpage/gaoptout" className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">Google Analytics Opt-out Browser Add-on</a></li>
-                  <li><strong>Facebook:</strong> <a href="https://www.facebook.com/settings?tab=ads" className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">Facebook Ad Preferences</a></li>
-                  <li><strong>Network Advertising Initiative:</strong> <a href="http://optout.networkadvertising.org/" className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">NAI Consumer Opt-out</a></li>
-                  <li><strong>Digital Advertising Alliance:</strong> <a href="http://optout.aboutads.info/" className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">DAA Consumer Choice</a></li>
+                  <li><strong>Google Analytics:</strong> <a href="https://tools.google.com/dlpage/gaoptout" className=\"text-blue-600 underline" target=\"_blank" rel="noopener noreferrer">Google Analytics Opt-out Browser Add-on</a></li>
+                  <li><strong>Facebook:</strong> <a href="https://www.facebook.com/settings?tab=ads" className=\"text-blue-600 underline" target=\"_blank" rel="noopener noreferrer">Facebook Ad Preferences</a></li>
+                  <li><strong>Network Advertising Initiative:</strong> <a href="http://optout.networkadvertising.org/" className=\"text-blue-600 underline" target=\"_blank" rel="noopener noreferrer">NAI Consumer Opt-out</a></li>
+                  <li><strong>Digital Advertising Alliance:</strong> <a href="http://optout.aboutads.info/" className=\"text-blue-600 underline" target=\"_blank" rel="noopener noreferrer">DAA Consumer Choice</a></li>
                 </ul>
 
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
