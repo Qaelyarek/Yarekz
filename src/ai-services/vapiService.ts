@@ -1,4 +1,4 @@
-import createVapi from '@vapi-ai/web';
+import Vapi from '@vapi-ai/web';
 
 // Initialize VAPI client with public key
 const vapi = createVapi(import.meta.env.VITE_VAPI_PUBLIC_KEY);
