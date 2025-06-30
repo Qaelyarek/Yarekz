@@ -8,6 +8,12 @@ interface EnvironmentConfig {
   vapiEndpoint: string;
   callWebhookUrl: string;
   
+  // VAPI Agents
+  vapiAgentMax: string;
+  vapiAgentGrace: string;
+  vapiAgentKyle: string;
+  vapiAgentSquad: string;
+  
   // AI Services
   openaiApiKey: string;
   anthropicApiKey: string;
@@ -50,6 +56,12 @@ export const env: EnvironmentConfig = {
   vapiPublicKey: getEnvVar('VITE_VAPI_PUBLIC_KEY'),
   vapiEndpoint: getEnvVar('VITE_VAPI_ENDPOINT', 'https://api.vapi.ai'),
   callWebhookUrl: getEnvVar('VITE_CALL_WEBHOOK_URL'),
+  
+  // VAPI Agents
+  vapiAgentMax: getEnvVar('VITE_AGENT_MAX'),
+  vapiAgentGrace: getEnvVar('VITE_AGENT_GRACE'),
+  vapiAgentKyle: getEnvVar('VITE_AGENT_KYLE'),
+  vapiAgentSquad: getEnvVar('VITE_AGENT_SQUAD'),
   
   // AI Services
   openaiApiKey: getEnvVar('VITE_OPENAI_API_KEY'),
@@ -112,6 +124,26 @@ export const validateVAPIConfig = (): boolean => {
   return true;
 };
 
+// Validate Squad agent configuration specifically
+export const validateSquadAgentConfig = (): boolean => {
+  const squadAgentId = env.vapiAgentSquad;
+  
+  if (!squadAgentId || squadAgentId === 'your_squad_agent_id_here') {
+    console.error('❌ Squad Agent ID not configured properly');
+    return false;
+  }
+  
+  // Basic format validation for UUID-like strings
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  
+  if (!uuidRegex.test(squadAgentId)) {
+    console.warn('⚠️ Squad Agent ID format appears invalid (expected UUID format)');
+  }
+  
+  console.log('✅ Squad Agent configuration validated successfully');
+  return true;
+};
+
 // Environment validation helper
 export const validateRequiredEnvVars = () => {
   const requiredForProduction = [
@@ -141,6 +173,7 @@ export const validateRequiredEnvVars = () => {
 // Export validation status
 export const envValidation = {
   isVAPIConfigured: validateVAPIConfig(),
+  isSquadAgentConfigured: validateSquadAgentConfig(),
   isDevelopment,
   isProduction,
   isStaging,

@@ -9,6 +9,7 @@ import AIPhoneHero from './components/hero/AIPhoneHero';
 import EnhancedAIPhoneHero from './components/hero/EnhancedAIPhoneHero';
 import VAPIPhoneInterface from './components/ai/VAPIPhoneInterface';
 import ProfessionalCallInterface from './components/ui/ProfessionalCallInterface';
+import SquadAgentDemo from './components/demo/SquadAgentDemo';
 import VAPIService from './ai-services/vapi-official';
 import FeaturesPage from './pages/FeaturesPage';
 import AISolutionsPage from './pages/AISolutionsPage';
@@ -59,6 +60,7 @@ function App() {
               <Route path="/ai-assistant-demo" element={<AIPhoneHero />} />
               <Route path="/voice-interface-demo" element={<InterfaceDemo />} />
               <Route path="/ai-phone-interface" element={<EnhancedAIPhoneHero />} />
+              <Route path="/squad-agent-demo" element={<SquadAgentDemo />} />
               
               {/* Legal Pages */}
               <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />

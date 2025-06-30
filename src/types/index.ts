@@ -76,3 +76,27 @@ export interface ChatMessage {
   timestamp: Date;
   aiProvider?: string;
 }
+
+// VAPI Agent Types
+export type AgentType = 'max' | 'grace' | 'kyle' | 'squad';
+
+export interface VAPIAgent {
+  id: string;
+  name: string;
+  type: AgentType;
+  description: string;
+  capabilities: string[];
+  isActive: boolean;
+}
+
+// Squad Agent specific types
+export interface SquadAgentConfig {
+  agentId: string;
+  teamSize: number;
+  specializations: string[];
+  availableHours: {
+    start: string;
+    end: string;
+    timezone: string;
+  };
+}
