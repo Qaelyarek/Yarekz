@@ -24,9 +24,8 @@ function setAssistant(agent: AgentType): void {
   }
   
   // Use the correct method to set the agent
-  vapi.start({
-    assistantId: agentId
-  });
+ vapi.set({ agentId });
+  
 }
 
 // Export the vapi instance and helper functions
