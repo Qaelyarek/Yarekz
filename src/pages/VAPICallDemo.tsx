@@ -78,7 +78,7 @@ const VAPICallDemo: React.FC = () => {
                   <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold mt-0.5">1</div>
                   <div>
                     <strong>Click "Start Call"</strong> to initiate a connection with the VAPI assistant. 
-                    The button will show "Connecting..." while establishing the connection.
+                    The button will show "Connecting...\" while establishing the connection.
                   </div>
                 </div>
                 
