@@ -43,6 +43,111 @@
   .glass-effect {
     @apply bg-white/10 backdrop-blur-lg border border-white/20;
   }
+
+  /* VAPI Call Button Animations */
+  .vapi-call-button,
+  [data-vapi-call="true"] {
+    @apply relative overflow-hidden;
+    transition: all 0.3s ease-in-out;
+    will-change: transform, box-shadow, filter;
+  }
+
+  .vapi-call-button:hover,
+  [data-vapi-call="true"]:hover {
+    transform: scale(1.05);
+    box-shadow: 
+      0 10px 25px -5px rgba(59, 130, 246, 0.4),
+      0 10px 10px -5px rgba(59, 130, 246, 0.2),
+      0 0 0 1px rgba(59, 130, 246, 0.3);
+    filter: brightness(1.1);
+  }
+
+  .vapi-call-button:active,
+  [data-vapi-call="true"]:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease-in-out;
+  }
+
+  .vapi-call-button:focus-visible,
+  [data-vapi-call="true"]:focus-visible {
+    outline: none;
+    box-shadow: 
+      0 0 0 3px rgba(59, 130, 246, 0.5),
+      0 10px 25px -5px rgba(59, 130, 246, 0.4);
+  }
+
+  /* Pulse animation for connecting state */
+  .vapi-call-button.connecting,
+  [data-vapi-call="true"].connecting {
+    animation: vapi-pulse 1.5s ease-in-out infinite;
+  }
+
+  /* Glow animation for active call state */
+  .vapi-call-button.active,
+  [data-vapi-call="true"].active {
+    animation: vapi-glow 2s ease-in-out infinite alternate;
+    box-shadow: 
+      0 0 20px rgba(239, 68, 68, 0.6),
+      0 0 40px rgba(239, 68, 68, 0.4),
+      0 0 60px rgba(239, 68, 68, 0.2);
+  }
+
+  .vapi-call-button.active:hover,
+  [data-vapi-call="true"].active:hover {
+    transform: scale(1.05);
+    box-shadow: 
+      0 0 25px rgba(239, 68, 68, 0.7),
+      0 0 50px rgba(239, 68, 68, 0.5),
+      0 0 75px rgba(239, 68, 68, 0.3);
+  }
+
+  /* Disabled state */
+  .vapi-call-button:disabled,
+  [data-vapi-call="true"]:disabled {
+    transform: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    opacity: 0.5;
+    cursor: not-allowed;
+    animation: none !important;
+  }
+
+  /* Fallback for browsers without modern CSS support */
+  @supports not (transform: scale(1.05)) {
+    .vapi-call-button:hover,
+    [data-vapi-call="true"]:hover {
+      box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+    }
+  }
+
+  /* Reduced motion support for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    .vapi-call-button,
+    [data-vapi-call="true"] {
+      transition: box-shadow 0.3s ease-in-out;
+    }
+    
+    .vapi-call-button:hover,
+    [data-vapi-call="true"]:hover {
+      transform: none;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    
+    .vapi-call-button.connecting,
+    [data-vapi-call="true"].connecting,
+    .vapi-call-button.active,
+    [data-vapi-call="true"].active {
+      animation: none;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .vapi-call-button:hover,
+    [data-vapi-call="true"]:hover {
+      box-shadow: 0 0 0 2px currentColor;
+    }
+  }
 }
 
 @layer utilities {
@@ -86,6 +191,33 @@
   }
   to {
     box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
+  }
+}
+
+/* VAPI-specific animations */
+@keyframes vapi-pulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 15px rgba(59, 130, 246, 0.4),
+      0 0 30px rgba(59, 130, 246, 0.2);
+  }
+  50% {
+    box-shadow: 
+      0 0 25px rgba(59, 130, 246, 0.6),
+      0 0 50px rgba(59, 130, 246, 0.4);
+  }
+}
+
+@keyframes vapi-glow {
+  from {
+    box-shadow: 
+      0 0 20px rgba(239, 68, 68, 0.5),
+      0 0 40px rgba(239, 68, 68, 0.3);
+  }
+  to {
+    box-shadow: 
+      0 0 30px rgba(239, 68, 68, 0.7),
+      0 0 60px rgba(239, 68, 68, 0.5);
   }
 }
 

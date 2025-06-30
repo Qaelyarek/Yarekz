@@ -190,6 +190,20 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
     return 'bg-gray-400';
   };
 
+  const getButtonClasses = () => {
+    let baseClasses = "flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed vapi-call-button";
+    
+    if (callState.isConnecting) {
+      baseClasses += " connecting bg-yellow-500 text-white";
+    } else if (callState.inCall) {
+      baseClasses += " active bg-red-600 hover:bg-red-700 text-white";
+    } else {
+      baseClasses += " bg-blue-600 hover:bg-blue-700 text-white";
+    }
+    
+    return baseClasses;
+  };
+
   const isAISpeaking = transcript.length > 0 && transcript[transcript.length - 1]?.role === 'assistant';
 
   return (
@@ -259,11 +273,8 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
           <button
             onClick={callState.inCall ? endCall : startCall}
             disabled={callState.isConnecting || !vapiStatus.initialized}
-            className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
-              callState.inCall
-                ? 'bg-red-600 hover:bg-red-700 text-white'
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
-            }`}
+            className={getButtonClasses()}
+            data-vapi-call="true"
           >
             {callState.isConnecting ? (
               <Loader2 className="w-5 h-5 animate-spin" />

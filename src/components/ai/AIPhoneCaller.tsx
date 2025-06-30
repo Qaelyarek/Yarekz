@@ -169,6 +169,18 @@ const AIPhoneCaller: React.FC<AIPhoneCallerProps> = ({
     return 'Talk to AI Assistant';
   };
 
+  const getButtonClasses = () => {
+    let baseClasses = "group relative bg-black text-white border-2 border-white px-12 py-6 rounded-2xl font-bold text-xl transition-all duration-300 hover:bg-white hover:text-black transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none vapi-call-button";
+    
+    if (callState.isConnecting) {
+      baseClasses += " connecting";
+    } else if (callState.inCall) {
+      baseClasses += " active bg-red-600 border-red-600 hover:bg-red-700 hover:text-white";
+    }
+    
+    return `${baseClasses} ${className}`;
+  };
+
   if (!callState.inCall) {
     return (
       <div className={`${className}`}>
@@ -261,7 +273,8 @@ const AIPhoneCaller: React.FC<AIPhoneCallerProps> = ({
         <button
           onClick={handleConnect}
           disabled={callState.isConnecting || !vapiStatus.initialized}
-          className={`group relative bg-black text-white border-2 border-white px-12 py-6 rounded-2xl font-bold text-xl transition-all duration-300 hover:bg-white hover:text-black transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ${className}`}
+          className={getButtonClasses()}
+          data-vapi-call="true"
         >
           <div className="flex items-center justify-center space-x-4">
             <Phone className={`w-8 h-8 ${callState.isConnecting ? 'animate-pulse' : 'group-hover:animate-pulse'}`} />
@@ -359,7 +372,8 @@ const AIPhoneCaller: React.FC<AIPhoneCallerProps> = ({
         
         <button
           onClick={handleDisconnect}
-          className="p-3 rounded-full bg-red-600 border-2 border-red-600 text-white hover:bg-red-700 transition-all duration-300"
+          className="p-3 rounded-full bg-red-600 border-2 border-red-600 text-white hover:bg-red-700 transition-all duration-300 vapi-call-button active"
+          data-vapi-call="true"
         >
           <PhoneOff className="w-5 h-5" />
         </button>
