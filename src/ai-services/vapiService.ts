@@ -1,6 +1,6 @@
-import { createVapi } from '@vapi-ai/web';
+import Vapi from '@vapi-ai/web';
 
-const vapi = createVapi({
+const vapi = new Vapi({
   apiKey: import.meta.env.VITE_VAPI_PUBLIC_KEY,
 });
 
