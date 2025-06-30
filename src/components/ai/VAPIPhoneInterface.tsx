@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Phone, PhoneOff, Mic, MicOff, Loader2, MessageSquare, Send, AlertCircle } from 'lucide-react';
 import VAPIService from '../../ai-services/vapi-official';
 import VoiceWaveform from './VoiceWaveform';
+import { vapi } from '../ai-services/vapiService';
 import type { VAPIMessage, VAPIMetrics } from '../../ai-services/vapi-official';
 
 interface VAPIPhoneInterfaceProps {
@@ -131,7 +132,7 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
     };
   }, [handleCallStart, handleCallEnd, handleMessage, handleVolumeLevel, handleSpeechStart, handleSpeechEnd, handleError]);
 
-  // Call management
+  // Call management with new vapi service
   const startCall = async () => {
     if (isConnecting || !vapiStatus.initialized) return;
 
@@ -139,11 +140,8 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
     setError(null);
 
     try {
-      const result = await VAPIService.startCall();
-      if (!result.success) {
-        setError(result.message);
-        setIsConnecting(false);
-      }
+      // Use the new vapi service to start call with 'max' agent
+      vapi.start('max');
     } catch (error) {
       console.error('Failed to start call:', error);
       setError('Failed to connect. Please try again.');
