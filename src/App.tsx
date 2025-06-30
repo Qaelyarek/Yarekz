@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import { DollarSign, TrendingUp, Target, Star, Clock, Shield, Users } from 'lucide-react';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
@@ -7,6 +8,10 @@ import VAPIDemo from './components/VAPIDemo';
 import AIPhoneHero from './components/hero/AIPhoneHero';
 import EnhancedAIPhoneHero from './components/hero/EnhancedAIPhoneHero';
 import VAPIPhoneInterface from './components/ai/VAPIPhoneInterface';
+import FeaturesPage from './pages/FeaturesPage';
+import AISolutionsPage from './pages/AISolutionsPage';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
 import { validateRequiredEnvVars, isDevelopment } from './config/environment';
 
 function App() {
@@ -22,26 +27,32 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <div className="min-h-screen bg-white">
-        <Header 
-          onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
-          isMenuOpen={isMenuOpen}
-        />
-        
-        <main>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/vapi-demo" element={<VAPIDemo />} />
-            <Route path="/hero-demo" element={<AIPhoneHero />} />
-            <Route path="/enhanced-hero" element={<EnhancedAIPhoneHero />} />
-            <Route path="/interface-demo" element={<InterfaceDemo />} />
-          </Routes>
-        </main>
+    <HelmetProvider>
+      <Router>
+        <div className="min-h-screen bg-white">
+          <Header 
+            onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
+            isMenuOpen={isMenuOpen}
+          />
+          
+          <main>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/features" element={<FeaturesPage />} />
+              <Route path="/ai-solutions" element={<AISolutionsPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/vapi-demo" element={<VAPIDemo />} />
+              <Route path="/hero-demo" element={<AIPhoneHero />} />
+              <Route path="/enhanced-hero" element={<EnhancedAIPhoneHero />} />
+              <Route path="/interface-demo" element={<InterfaceDemo />} />
+            </Routes>
+          </main>
 
-        <Footer />
-      </div>
-    </Router>
+          <Footer />
+        </div>
+      </Router>
+    </HelmetProvider>
   );
 }
 
