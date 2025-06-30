@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Phone, PhoneOff, Mic, MicOff, Loader2, MessageSquare, Send, AlertCircle, Clock } from 'lucide-react';
+import { Phone, PhoneOff, Mic, MicOff, Loader2, MessageSquare, Send, AlertCircle, Clock, X, CheckCircle } from 'lucide-react';
 import VAPIService from '../../ai-services/vapi-official';
 import VoiceWaveform from './VoiceWaveform';
 import { setAssistant } from '../../ai-services/vapiService';
@@ -19,6 +19,13 @@ interface TranscriptEntry {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+}
+
+interface DisconnectState {
+  isDisconnected: boolean;
+  showConfirmation: boolean;
+  preventMessages: boolean;
+  confirmationMessage: string;
 }
 
 const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
@@ -44,6 +51,14 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
   const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
   const [textMessage, setTextMessage] = useState('');
 
+  // Enhanced disconnect state for message interface
+  const [disconnectState, setDisconnectState] = useState<DisconnectState>({
+    isDisconnected: false,
+    showConfirmation: false,
+    preventMessages: false,
+    confirmationMessage: ''
+  });
+
   // VAPI status
   const [vapiStatus, setVapiStatus] = useState(VAPIService.getStatus());
 
@@ -55,26 +70,66 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
     return () => clearInterval(interval);
   }, []);
 
+  // Auto-hide disconnect confirmation after 4 seconds
+  useEffect(() => {
+    if (disconnectState.showConfirmation) {
+      const timer = setTimeout(() => {
+        setDisconnectState(prev => ({
+          ...prev,
+          showConfirmation: false,
+          confirmationMessage: ''
+        }));
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [disconnectState.showConfirmation]);
+
   // Event handlers
   const handleCallStateChanged = useCallback((newCallState: VAPICallState) => {
     console.log('📱 Call state changed:', newCallState);
     setCallState(newCallState);
     
-    // Trigger callbacks based on call state changes
-    if (newCallState.inCall && !callState.inCall) {
-      // Call just started
+    // Handle disconnect state based on call changes
+    if (!newCallState.inCall && callState.inCall) {
+      // Call just ended - set disconnect state
+      setDisconnectState({
+        isDisconnected: true,
+        showConfirmation: true,
+        preventMessages: true,
+        confirmationMessage: 'Conversation ended'
+      });
+      
+      // Add system message to transcript
+      const systemMessage: TranscriptEntry = {
+        id: `system-${Date.now()}`,
+        role: 'assistant',
+        content: '--- Conversation Ended ---',
+        timestamp: new Date(),
+      };
+      setTranscript(prev => [...prev, systemMessage]);
+      
+      onCallEnd?.();
+    } else if (newCallState.inCall && !callState.inCall) {
+      // Call just started - reset disconnect state
+      setDisconnectState({
+        isDisconnected: false,
+        showConfirmation: false,
+        preventMessages: false,
+        confirmationMessage: ''
+      });
       setError(null);
       setTranscript([]);
       onCallStart?.();
-    } else if (!newCallState.inCall && callState.inCall) {
-      // Call just ended
-      setIsMuted(false);
-      setMetrics({});
-      onCallEnd?.();
     }
   }, [callState.inCall, onCallStart, onCallEnd]);
 
   const handleMessage = useCallback((message: VAPIMessage) => {
+    // Prevent new messages if disconnected
+    if (disconnectState.preventMessages) {
+      console.log('🚫 Message blocked - conversation ended');
+      return;
+    }
+
     if (message.type === 'transcript' && message.transcript) {
       const entry: TranscriptEntry = {
         id: `${Date.now()}-${Math.random()}`,
@@ -84,7 +139,7 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
       };
       setTranscript(prev => [...prev, entry]);
     }
-  }, []);
+  }, [disconnectState.preventMessages]);
 
   const handleVolumeLevel = useCallback((volume: number) => {
     setMetrics(prev => ({ ...prev, audioLevel: volume }));
@@ -130,14 +185,19 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
     };
   }, [handleCallStateChanged, handleMessage, handleVolumeLevel, handleSpeechStart, handleSpeechEnd, handleCallDurationUpdate, handleError]);
 
-  // Call management with new vapi service
+  // Call management functions
   const startCall = async () => {
     if (callState.isConnecting || !vapiStatus.initialized) return;
 
     setError(null);
+    setDisconnectState({
+      isDisconnected: false,
+      showConfirmation: false,
+      preventMessages: false,
+      confirmationMessage: ''
+    });
 
     try {
-      // Use the new vapi service to start call with 'max' agent
       setAssistant('max');
     } catch (error) {
       console.error('Failed to start call:', error);
@@ -147,19 +207,34 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
 
   const endCall = async () => {
     try {
-      await VAPIService.endCall();
+      console.log('🔴 MESSAGE INTERFACE: Terminating call and conversation...');
+      
+      // Immediately prevent new messages
+      setDisconnectState(prev => ({ ...prev, preventMessages: true }));
+      
+      // Terminate the call
+      const result = await VAPIService.endCall();
+      
+      if (result.success) {
+        console.log('✅ MESSAGE INTERFACE: Call terminated successfully');
+      } else {
+        console.error('❌ MESSAGE INTERFACE: Call termination failed:', result.message);
+      }
+      
     } catch (error) {
-      console.error('Failed to end call:', error);
+      console.error('❌ MESSAGE INTERFACE: Failed to end call:', error);
+      setError('Failed to end conversation');
     }
   };
 
   const toggleMute = () => {
+    if (disconnectState.preventMessages) return;
     VAPIService.toggleMute();
     setIsMuted(VAPIService.isMuted());
   };
 
   const sendTextMessage = async () => {
-    if (!textMessage.trim() || !callState.inCall) return;
+    if (!textMessage.trim() || !callState.inCall || disconnectState.preventMessages) return;
 
     try {
       await VAPIService.sendMessage(textMessage);
@@ -179,12 +254,14 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
   };
 
   const getCallStateDisplay = () => {
+    if (disconnectState.isDisconnected) return 'Disconnected';
     if (callState.isConnecting) return 'Connecting...';
     if (callState.inCall) return 'Connected';
     return 'Ready';
   };
 
   const getCallStateColor = () => {
+    if (disconnectState.isDisconnected) return 'bg-red-500';
     if (callState.isConnecting) return 'bg-yellow-500';
     if (callState.inCall) return 'bg-green-500';
     return 'bg-gray-400';
@@ -193,7 +270,9 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
   const getButtonClasses = () => {
     let baseClasses = "flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed vapi-call-button";
     
-    if (callState.isConnecting) {
+    if (disconnectState.isDisconnected) {
+      baseClasses += " bg-gray-400 text-white cursor-not-allowed";
+    } else if (callState.isConnecting) {
       baseClasses += " connecting bg-yellow-500 text-white";
     } else if (callState.inCall) {
       baseClasses += " active bg-red-600 hover:bg-red-700 text-white";
@@ -204,11 +283,13 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
     return baseClasses;
   };
 
-  const isAISpeaking = transcript.length > 0 && transcript[transcript.length - 1]?.role === 'assistant';
+  const isAISpeaking = transcript.length > 0 && 
+    transcript[transcript.length - 1]?.role === 'assistant' && 
+    !transcript[transcript.length - 1]?.content.includes('---');
 
   return (
     <div className={`bg-white border border-gray-200 rounded-xl shadow-lg ${className}`}>
-      {/* Header */}
+      {/* Header with Enhanced Disconnect Status */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -216,10 +297,12 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
             <h3 className="text-lg font-semibold text-gray-900">
               AI Assistant
             </h3>
-            <span className="text-sm text-gray-500">
+            <span className={`text-sm font-medium ${
+              disconnectState.isDisconnected ? 'text-red-600' : 'text-gray-500'
+            }`}>
               {getCallStateDisplay()}
             </span>
-            {callState.inCall && (
+            {callState.inCall && !disconnectState.isDisconnected && (
               <div className="flex items-center space-x-1 text-sm text-gray-500">
                 <Clock className="w-4 h-4" />
                 <span>{VAPIService.formatCallDuration()}</span>
@@ -227,11 +310,21 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
             )}
           </div>
 
+          {/* Disconnect Confirmation Display */}
+          {disconnectState.showConfirmation && (
+            <div className="flex items-center space-x-2 bg-green-50 px-3 py-1 rounded-full">
+              <CheckCircle className="w-4 h-4 text-green-600" />
+              <span className="text-sm font-medium text-green-700">
+                {disconnectState.confirmationMessage}
+              </span>
+            </div>
+          )}
+
           {debugMode && (
             <div className="text-xs text-gray-500">
               Status: {vapiStatus.initialized ? '✅' : '❌'} | 
               Config: {vapiStatus.configValid ? '✅' : '❌'} |
-              inCall: {callState.inCall ? '✅' : '❌'}
+              Disconnected: {disconnectState.isDisconnected ? '✅' : '❌'}
             </div>
           )}
         </div>
@@ -251,13 +344,15 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
         {/* Voice Visualization */}
         <div className="text-center mb-6">
           <VoiceWaveform
-            isActive={callState.inCall}
+            isActive={callState.inCall && !disconnectState.isDisconnected}
             isAISpeaking={isAISpeaking}
             intensity={metrics.audioLevel || 0}
             className="h-16 text-blue-600"
           />
           <div className="mt-2 text-sm text-gray-600">
-            {callState.inCall ? (
+            {disconnectState.isDisconnected ? (
+              'Conversation ended'
+            ) : callState.inCall ? (
               isAISpeaking ? 'AI is speaking...' : 
               metrics.isUserSpeaking ? 'You are speaking...' : 'Listening...'
             ) : callState.isConnecting ? (
@@ -268,27 +363,31 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
           </div>
         </div>
 
-        {/* Call Controls */}
+        {/* Enhanced Call Controls with Prominent Disconnect */}
         <div className="flex items-center justify-center space-x-4 mb-6">
           <button
-            onClick={callState.inCall ? endCall : startCall}
+            onClick={disconnectState.isDisconnected ? startCall : (callState.inCall ? endCall : startCall)}
             disabled={callState.isConnecting || !vapiStatus.initialized}
             className={getButtonClasses()}
             data-vapi-call="true"
           >
             {callState.isConnecting ? (
               <Loader2 className="w-5 h-5 animate-spin" />
+            ) : disconnectState.isDisconnected ? (
+              <Phone className="w-5 h-5" />
             ) : callState.inCall ? (
               <PhoneOff className="w-5 h-5" />
             ) : (
               <Phone className="w-5 h-5" />
             )}
             <span>
-              {callState.isConnecting ? 'Connecting...' : callState.inCall ? 'End Call' : 'Start Call'}
+              {callState.isConnecting ? 'Connecting...' : 
+               disconnectState.isDisconnected ? 'Start New Call' :
+               callState.inCall ? 'Disconnect' : 'Start Call'}
             </span>
           </button>
 
-          {callState.inCall && (
+          {callState.inCall && !disconnectState.isDisconnected && (
             <button
               onClick={toggleMute}
               className={`p-3 rounded-lg border transition-all duration-300 ${
@@ -296,18 +395,29 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
                   ? 'bg-red-100 border-red-300 text-red-700 hover:bg-red-200'
                   : 'bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200'
               }`}
+              disabled={disconnectState.preventMessages}
             >
               {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
             </button>
           )}
         </div>
 
-        {/* Transcript */}
+        {/* Enhanced Transcript with Disconnect State */}
         {showTranscript && transcript.length > 0 && (
-          <div className="border border-gray-200 rounded-lg p-4 mb-4">
-            <div className="flex items-center space-x-2 mb-3">
-              <MessageSquare className="w-4 h-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">Conversation</span>
+          <div className={`border border-gray-200 rounded-lg p-4 mb-4 ${
+            disconnectState.isDisconnected ? 'bg-gray-50' : ''
+          }`}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center space-x-2">
+                <MessageSquare className="w-4 h-4 text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">Conversation</span>
+              </div>
+              {disconnectState.isDisconnected && (
+                <div className="flex items-center space-x-1 text-xs text-red-600">
+                  <X className="w-3 h-3" />
+                  <span>Ended</span>
+                </div>
+              )}
             </div>
             <div className="space-y-3 max-h-48 overflow-y-auto">
               {transcript.map((entry) => (
@@ -317,7 +427,9 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
                 >
                   <div
                     className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
-                      entry.role === 'user'
+                      entry.content.includes('---') 
+                        ? 'bg-red-50 text-red-700 border border-red-200 italic text-center w-full max-w-none'
+                        : entry.role === 'user'
                         ? 'bg-blue-600 text-white'
                         : 'bg-gray-100 text-gray-900'
                     }`}
@@ -327,10 +439,22 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
                 </div>
               ))}
             </div>
+            
+            {/* Disconnection Warning */}
+            {disconnectState.preventMessages && (
+              <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="flex items-start space-x-2">
+                  <AlertCircle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                  <div className="text-sm text-yellow-700">
+                    Conversation has ended. No further messages can be exchanged with the AI agent.
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
-        {/* Text Input */}
+        {/* Enhanced Text Input with Disconnect Prevention */}
         {allowTextInput && callState.inCall && (
           <div className="flex space-x-2">
             <input
@@ -338,16 +462,30 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
               value={textMessage}
               onChange={(e) => setTextMessage(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && sendTextMessage()}
-              placeholder="Type a message..."
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder={disconnectState.preventMessages ? "Conversation ended" : "Type a message..."}
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
+              disabled={disconnectState.preventMessages}
             />
             <button
               onClick={sendTextMessage}
-              disabled={!textMessage.trim()}
+              disabled={!textMessage.trim() || disconnectState.preventMessages}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <Send className="w-4 h-4" />
             </button>
+          </div>
+        )}
+
+        {/* Disconnect Status Update */}
+        {disconnectState.isDisconnected && (
+          <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg text-center">
+            <div className="flex items-center justify-center space-x-2 text-gray-700">
+              <CheckCircle className="w-5 h-5 text-green-600" />
+              <span className="font-medium">Conversation Ended</span>
+            </div>
+            <p className="text-sm text-gray-500 mt-1">
+              The connection with the AI agent has been terminated. Start a new call to begin a fresh conversation.
+            </p>
           </div>
         )}
       </div>
@@ -360,11 +498,11 @@ const VAPIPhoneInterface: React.FC<VAPIPhoneInterfaceProps> = ({
               <div>Assistant: {vapiStatus.assistantId.substring(0, 12)}...</div>
               <div>In Call: {callState.inCall ? 'Yes' : 'No'}</div>
               <div>Connecting: {callState.isConnecting ? 'Yes' : 'No'}</div>
-              <div>Audio Level: {(metrics.audioLevel || 0).toFixed(2)}</div>
+              <div>Disconnected: {disconnectState.isDisconnected ? 'Yes' : 'No'}</div>
             </div>
             <div>
               <div>Muted: {isMuted ? 'Yes' : 'No'}</div>
-              <div>Speaking: {metrics.isUserSpeaking ? 'Yes' : 'No'}</div>
+              <div>Messages Blocked: {disconnectState.preventMessages ? 'Yes' : 'No'}</div>
               <div>Duration: {VAPIService.formatCallDuration()}</div>
               <div>Messages: {transcript.length}</div>
             </div>
