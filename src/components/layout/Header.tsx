@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, MessageCircle, Phone } from 'lucide-react';
 import Button from '../ui/Button';
-import VAPIService from '../../ai-services/vapi';
+import VAPIService from '../../ai-services/vapi-official';
 
 interface HeaderProps {
   onMenuToggle?: () => void;
@@ -12,6 +12,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [callState, setCallState] = useState(VAPIService.getCallState());
   const location = useLocation();
 
   useEffect(() => {
@@ -23,10 +24,23 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleCallAI = async () => {
-    if (isConnecting) return;
+  // Listen for VAPI call state changes
+  useEffect(() => {
+    const handleCallStateChanged = (newCallState: any) => {
+      setCallState(newCallState);
+      setIsConnecting(newCallState.isConnecting);
+    };
+
+    VAPIService.on('call-state-changed', handleCallStateChanged);
     
-    setIsConnecting(true);
+    return () => {
+      VAPIService.off('call-state-changed', handleCallStateChanged);
+    };
+  }, []);
+
+  const handleCallAI = async () => {
+    if (isConnecting || callState.inCall) return;
+    
     try {
       console.log('🎯 Header: Starting VAPI call...');
       const result = await VAPIService.startCall();
@@ -38,8 +52,6 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
     } catch (error) {
       console.error('Header: Failed to connect to AI agent:', error);
       alert('Failed to connect to AI agent. Please try again.');
-    } finally {
-      setIsConnecting(false);
     }
   };
 
@@ -50,6 +62,22 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
     { name: 'About Us', path: '/about-us' },
     { name: 'Contact', path: '/contact-us' },
   ];
+
+  const getCallButtonClasses = () => {
+    let baseClasses = "vapi-call-button border-0 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed";
+    
+    if (isConnecting) {
+      baseClasses += " connecting";
+    } else if (callState.inCall) {
+      baseClasses += " active";
+    }
+    
+    return `${baseClasses} ${
+      !isScrolled && location.pathname === '/' 
+        ? 'bg-white text-black hover:bg-gray-100' 
+        : 'bg-black text-white hover:bg-gray-800'
+    }`;
+  };
 
   return (
     <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${
@@ -130,14 +158,11 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
               size="sm"
               onClick={handleCallAI}
               disabled={isConnecting}
-              className={`${
-                !isScrolled && location.pathname === '/' 
-                  ? 'bg-white text-black hover:bg-gray-100' 
-                  : 'bg-black text-white hover:bg-gray-800'
-              } border-0 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed`}
+              className={getCallButtonClasses()}
+              data-vapi-call="true"
             >
               <Phone className={`w-4 h-4 mr-2 ${isConnecting ? 'animate-pulse' : ''}`} />
-              {isConnecting ? 'Connecting...' : 'Talk to AI'}
+              {isConnecting ? 'Connecting...' : callState.inCall ? 'End Call' : 'Talk to AI'}
             </Button>
           </div>
 
@@ -179,10 +204,11 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
                 variant="primary" 
                 onClick={handleCallAI}
                 disabled={isConnecting}
-                className="w-full mb-3 bg-black text-white disabled:opacity-50"
+                className="w-full mb-3 bg-black text-white disabled:opacity-50 vapi-call-button"
+                data-vapi-call="true"
               >
                 <Phone className={`w-4 h-4 mr-2 ${isConnecting ? 'animate-pulse' : ''}`} />
-                {isConnecting ? 'Connecting...' : 'Talk to AI Assistant'}
+                {isConnecting ? 'Connecting...' : callState.inCall ? 'End Call' : 'Talk to AI Assistant'}
               </Button>
               
               <div className="flex space-x-3">
@@ -199,7 +225,8 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle, isMenuOpen = false }) => 
                   size="sm" 
                   onClick={handleCallAI}
                   disabled={isConnecting}
-                  className="flex-1 border-2 border-black text-black disabled:opacity-50"
+                  className="flex-1 border-2 border-black text-black disabled:opacity-50 vapi-call-button"
+                  data-vapi-call="true"
                 >
                   <Phone className={`w-4 h-4 mr-2 ${isConnecting ? 'animate-pulse' : ''}`} />
                   Call AI

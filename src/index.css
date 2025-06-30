@@ -44,14 +44,16 @@
     @apply bg-white/10 backdrop-blur-lg border border-white/20;
   }
 
-  /* VAPI Call Button Animations */
+  /* VAPI Call Button Animations - Enhanced & Consistent */
   .vapi-call-button,
   [data-vapi-call="true"] {
     @apply relative overflow-hidden;
     transition: all 0.3s ease-in-out;
     will-change: transform, box-shadow, filter;
+    position: relative;
   }
 
+  /* Hover State - Subtle pulse and glow */
   .vapi-call-button:hover,
   [data-vapi-call="true"]:hover {
     transform: scale(1.05);
@@ -62,12 +64,14 @@
     filter: brightness(1.1);
   }
 
+  /* Click/Tap Feedback */
   .vapi-call-button:active,
   [data-vapi-call="true"]:active {
     transform: scale(0.98);
     transition: transform 0.1s ease-in-out;
   }
 
+  /* Focus State for Accessibility */
   .vapi-call-button:focus-visible,
   [data-vapi-call="true"]:focus-visible {
     outline: none;
@@ -76,13 +80,13 @@
       0 10px 25px -5px rgba(59, 130, 246, 0.4);
   }
 
-  /* Pulse animation for connecting state */
+  /* Connecting State - Pulsing blue glow */
   .vapi-call-button.connecting,
   [data-vapi-call="true"].connecting {
     animation: vapi-pulse 1.5s ease-in-out infinite;
   }
 
-  /* Glow animation for active call state */
+  /* Active Call State - Red glow animation */
   .vapi-call-button.active,
   [data-vapi-call="true"].active {
     animation: vapi-glow 2s ease-in-out infinite alternate;
@@ -101,7 +105,25 @@
       0 0 75px rgba(239, 68, 68, 0.3);
   }
 
-  /* Disabled state */
+  /* Success State - Green glow */
+  .vapi-call-button.success,
+  [data-vapi-call="true"].success {
+    box-shadow: 
+      0 0 20px rgba(34, 197, 94, 0.6),
+      0 0 40px rgba(34, 197, 94, 0.4);
+    animation: vapi-success-pulse 1s ease-in-out;
+  }
+
+  /* Error State - Red outline */
+  .vapi-call-button.error,
+  [data-vapi-call="true"].error {
+    box-shadow: 
+      0 0 0 2px rgba(239, 68, 68, 0.7),
+      0 0 20px rgba(239, 68, 68, 0.3);
+    animation: vapi-error-shake 0.5s ease-in-out;
+  }
+
+  /* Disabled State */
   .vapi-call-button:disabled,
   [data-vapi-call="true"]:disabled {
     transform: none !important;
@@ -112,7 +134,25 @@
     animation: none !important;
   }
 
-  /* Fallback for browsers without modern CSS support */
+  /* Shimmer effect for loading states */
+  .vapi-call-button.loading::before,
+  [data-vapi-call="true"].loading::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    animation: shimmer 2s infinite;
+  }
+
+  /* Cross-browser compatibility fallbacks */
   @supports not (transform: scale(1.05)) {
     .vapi-call-button:hover,
     [data-vapi-call="true"]:hover {
@@ -120,7 +160,14 @@
     }
   }
 
-  /* Reduced motion support for accessibility */
+  @supports not (filter: brightness(1.1)) {
+    .vapi-call-button:hover,
+    [data-vapi-call="true"]:hover {
+      opacity: 0.9;
+    }
+  }
+
+  /* Accessibility - Reduced motion support */
   @media (prefers-reduced-motion: reduce) {
     .vapi-call-button,
     [data-vapi-call="true"] {
@@ -146,6 +193,19 @@
     .vapi-call-button:hover,
     [data-vapi-call="true"]:hover {
       box-shadow: 0 0 0 2px currentColor;
+    }
+    
+    .vapi-call-button.connecting,
+    [data-vapi-call="true"].connecting {
+      border: 2px solid currentColor;
+    }
+  }
+
+  /* Dark mode adjustments */
+  @media (prefers-color-scheme: dark) {
+    .vapi-call-button:hover,
+    [data-vapi-call="true"]:hover {
+      filter: brightness(1.2);
     }
   }
 }
@@ -218,6 +278,34 @@
     box-shadow: 
       0 0 30px rgba(239, 68, 68, 0.7),
       0 0 60px rgba(239, 68, 68, 0.5);
+  }
+}
+
+@keyframes vapi-success-pulse {
+  0% {
+    box-shadow: 
+      0 0 20px rgba(34, 197, 94, 0.6),
+      0 0 40px rgba(34, 197, 94, 0.4);
+  }
+  100% {
+    box-shadow: 
+      0 0 30px rgba(34, 197, 94, 0.8),
+      0 0 60px rgba(34, 197, 94, 0.6);
+  }
+}
+
+@keyframes vapi-error-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
   }
 }
 

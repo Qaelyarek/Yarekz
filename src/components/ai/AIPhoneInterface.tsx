@@ -161,6 +161,20 @@ const AIPhoneInterface: React.FC<AIPhoneInterfaceProps> = ({
     return 'Ready to connect';
   };
 
+  const getButtonClasses = () => {
+    let baseClasses = "vapi-call-button relative inline-flex items-center justify-center space-x-3 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none";
+    
+    if (isConnecting) {
+      baseClasses += " connecting bg-yellow-500 text-white border-2 border-yellow-500";
+    } else if (isCalling) {
+      baseClasses += " active bg-red-600 hover:bg-red-700 text-white border-2 border-red-600";
+    } else {
+      baseClasses += " bg-blue-600 hover:bg-blue-700 text-white border-2 border-blue-600";
+    }
+    
+    return baseClasses;
+  };
+
   return (
     <div className={`bg-white rounded-xl border border-gray-200 shadow-lg p-6 ${className}`}>
       {/* Header */}
@@ -205,17 +219,8 @@ const AIPhoneInterface: React.FC<AIPhoneInterfaceProps> = ({
         <button
           onClick={handleToggleCall}
           disabled={isConnecting}
-          className={`
-            relative inline-flex items-center justify-center space-x-3 px-8 py-4 rounded-xl font-semibold text-lg
-            transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
-            ${isCalling 
-              ? 'bg-red-600 hover:bg-red-700 text-white border-2 border-red-600 animate-pulse' 
-              : isConnecting
-              ? 'bg-yellow-500 text-white border-2 border-yellow-500'
-              : 'bg-blue-600 hover:bg-blue-700 text-white border-2 border-blue-600'
-            }
-            ${isCalling ? 'shadow-lg shadow-red-500/25' : 'shadow-lg shadow-blue-500/25'}
-          `}
+          className={getButtonClasses()}
+          data-vapi-call="true"
         >
           {/* Glowing outline animation for active call */}
           {isCalling && (

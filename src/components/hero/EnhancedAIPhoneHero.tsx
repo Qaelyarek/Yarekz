@@ -120,7 +120,8 @@ const EnhancedAIPhoneHero: React.FC<EnhancedAIPhoneHeroProps> = ({
                 <StarBorder
                   onClick={handleStartDemo}
                   speed="medium"
-                  className="text-xl hover:scale-105 transition-transform duration-300"
+                  className="text-xl hover:scale-105 transition-transform duration-300 vapi-call-button"
+                  data-vapi-call="true"
                 >
                   <div className="flex items-center space-x-3">
                     <Phone className="w-6 h-6" />
