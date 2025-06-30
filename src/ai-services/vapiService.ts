@@ -1,7 +1,6 @@
-import Vapi from '@vapi-ai/web'; // ⬅️ Default import, not destructured
+import Vapi from '@vapi-ai/web';
 
-// ✅ Instantiate using `new Vapi()` with config object
-const vapi = new Vapi({ apiKey: import.meta.env.VITE_VAPI_PUBLIC_KEY });
+const vapi = new Vapi(import.meta.env.VITE_VAPI_PUBLIC_KEY); // ✅ no object
 
 type AgentType = 'max' | 'grace' | 'kyle' | 'squad';
 
@@ -15,15 +14,11 @@ const agentMap: Record<AgentType, string> = {
 function setAssistant(agent: AgentType): void {
   const agentId = agentMap[agent];
   if (!agentId) {
-    throw new Error(
-      `Invalid agent name: ${agent}. Available agents: ${Object.keys(agentMap).join(', ')}`
-    );
+    throw new Error(`Invalid agent name: ${agent}. Available agents: ${Object.keys(agentMap).join(', ')}`);
   }
 
-  // ✅ Correct method is `start`, not `set`
-  vapi.start({
-    assistantId: agentId,
-  });
+  // ✅ Use this exact syntax for v2.3.8
+  vapi.start(agentId);
 }
 
 export { vapi, setAssistant };
