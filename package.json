@@ -15,6 +15,7 @@
   "dependencies": {
     "@headlessui/react": "^1.7.17",
     "@supabase/supabase-js": "^2.39.3",
+    "@vapi-ai/web": "^2.3.8",
     "axios": "^1.6.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
