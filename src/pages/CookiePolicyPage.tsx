@@ -370,7 +370,7 @@ const CookiePolicyPage: React.FC = () => {
                   <li><strong>Google Analytics:</strong> <a href="https://tools.google.com/dlpage/gaoptout" className=\"text-blue-600 underline" target=\"_blank" rel="noopener noreferrer">Google Analytics Opt-out Browser Add-on</a></li>
                   <li><strong>Facebook:</strong> <a href="https://www.facebook.com/settings?tab=ads" className=\"text-blue-600 underline" target=\"_blank" rel="noopener noreferrer">Facebook Ad Preferences</a></li>
                   <li><strong>Network Advertising Initiative:</strong> <a href="http://optout.networkadvertising.org/" className=\"text-blue-600 underline" target=\"_blank" rel="noopener noreferrer">NAI Consumer Opt-out</a></li>
-                  <li><strong>Digital Advertising Alliance:</strong> <a href="http://optout.aboutads.info/" className=\"text-blue-600 underline" target=\"_blank" rel="noopener noreferrer">DAA Consumer Choice</a></li>
+                  <li><strong>Digital Advertising Alliance:</strong> <a href="http://optout.aboutads.info/" className=\"text-blue-600 underline" target="_blank" rel="noopener noreferrer">DAA Consumer Choice</a></li>
                 </ul>
 
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
