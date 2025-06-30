@@ -1,7 +1,9 @@
 import Vapi from '@vapi-ai/web';
 
 // Initialize VAPI client with public key
-const vapi = createVapi(import.meta.env.VITE_VAPI_PUBLIC_KEY);
+const vapi = new Vapi({
+  apiKey: import.meta.env.VITE_VAPI_PUBLIC_KEY,
+});
 
 // Type definition for supported agents
 type AgentType = 'max' | 'grace' | 'kyle' | 'squad';
