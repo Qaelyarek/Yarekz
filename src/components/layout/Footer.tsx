@@ -83,27 +83,27 @@ const Footer: React.FC = () => {
             <div className="w-12 h-0.5 bg-white mb-6"></div>
             <ul className="space-y-4">
               <li>
-                <a href="/privacy" className="text-gray-300 hover:text-white transition-colors duration-300">
+                <Link to="/privacy-policy" className="text-gray-300 hover:text-white transition-colors duration-300">
                   Privacy Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/terms" className="text-gray-300 hover:text-white transition-colors duration-300">
+                <Link to="/terms-of-service" className="text-gray-300 hover:text-white transition-colors duration-300">
                   Terms of Service
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/cookies" className="text-gray-300 hover:text-white transition-colors duration-300">
+                <Link to="/cookie-policy" className="text-gray-300 hover:text-white transition-colors duration-300">
                   Cookie Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/security" className="text-gray-300 hover:text-white transition-colors duration-300">
-                  Security
-                </a>
+                <Link to="/disclaimer" className="text-gray-300 hover:text-white transition-colors duration-300">
+                  Disclaimer
+                </Link>
               </li>
               <li>
-                <a href="/compliance" className="text-gray-300 hover:text-white transition-colors duration-300">
+                <a href="#" className="text-gray-300 hover:text-white transition-colors duration-300">
                   Compliance
                 </a>
               </li>
