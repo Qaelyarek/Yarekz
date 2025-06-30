@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Brain, Briefcase, ShoppingCart, GraduationCap, TrendingUp, Users, DollarSign, Clock, ArrowRight, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Brain, Briefcase, ShoppingCart, GraduationCap, TrendingUp, Users, DollarSign, Clock, CheckCircle } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import VAPIPhoneInterface from '../components/ai/VAPIPhoneInterface';
 import { isDevelopment } from '../config/environment';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Mail, Phone, MapPin, Clock, MessageSquare, Send, CheckCircle, Calendar, Users, Zap } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, MapPin, Clock, MessageSquare, Send, CheckCircle, Calendar } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import VAPIPhoneInterface from '../components/ai/VAPIPhoneInterface';
 import { isDevelopment } from '../config/environment';
