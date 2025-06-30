@@ -157,7 +157,7 @@ const HomePage: React.FC = () => {
   );
 };
 
-// Minimalist CEO-Focused Funnel Page with enhanced professional call interface
+// Enhanced CEO-Focused Funnel with Proper Call Termination
 const MinimalistCEOFunnel: React.FC = () => {
   const [callState, setCallState] = useState(VAPIService.getCallState());
 
@@ -175,23 +175,30 @@ const MinimalistCEOFunnel: React.FC = () => {
 
   const handleCallAccept = async () => {
     try {
+      console.log('🚀 Starting call from professional interface...');
       const result = await VAPIService.startCall();
       if (!result.success) {
         console.error('Failed to start call:', result.message);
+        throw new Error(result.message);
       }
     } catch (error) {
       console.error('Error starting call:', error);
+      throw error; // Re-throw to be handled by the interface
     }
   };
 
   const handleCallEnd = async () => {
     try {
+      console.log('📞 Ending call from professional interface...');
       const result = await VAPIService.endCall();
       if (!result.success) {
         console.error('Failed to end call:', result.message);
+        throw new Error(result.message);
       }
+      console.log('✅ Call ended successfully');
     } catch (error) {
       console.error('Error ending call:', error);
+      throw error; // Re-throw to be handled by the interface
     }
   };
 
@@ -295,7 +302,7 @@ const MinimalistCEOFunnel: React.FC = () => {
         </div>
       </section>
 
-      {/* CTA Section with Professional Call Interface and Call Termination Button */}
+      {/* CTA Section with Enhanced Professional Call Interface */}
       <section className="bg-white text-black py-20 lg:py-32 border-t-4 border-black relative">
         <div className="max-w-6xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
@@ -306,18 +313,13 @@ const MinimalistCEOFunnel: React.FC = () => {
             Join 500+ CEOs who've automated their appointment setting with AI.
           </p>
           
-          {/* Professional Call Interface - Minimalist Black & White Design */}
+          {/* Enhanced Professional Call Interface with Proper Termination */}
           <div className="mb-12">
             <ProfessionalCallInterface
               isActive={callState.inCall}
               isConnecting={callState.isConnecting}
               onAccept={handleCallAccept}
               onEnd={handleCallEnd}
-              statusText={
-                callState.isConnecting ? "Connecting to AI agent..." :
-                callState.inCall ? `Call in progress (${VAPIService.formatCallDuration()})` :
-                "Talk to our AI agent now"
-              }
               className="mx-auto"
             />
           </div>
@@ -337,7 +339,7 @@ const MinimalistCEOFunnel: React.FC = () => {
           </div>
         </div>
 
-        {/* Call Termination Button - Positioned prominently when call is active */}
+        {/* Enhanced Call Termination Button - Only visible during active calls */}
         <CallTerminationButton
           visible={callState.inCall}
           onEndCall={handleCallEnd}
