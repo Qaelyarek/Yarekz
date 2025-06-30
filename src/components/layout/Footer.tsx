@@ -93,14 +93,14 @@ const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/cookie-policy" className="text-gray-300 hover:text-white transition-colors duration-300">
-                  Cookie Policy
-                </Link>
-              </li>
-              <li>
                 <Link to="/disclaimer" className="text-gray-300 hover:text-white transition-colors duration-300">
                   Disclaimer
                 </Link>
+              </li>
+              <li>
+                <a href="#" className="text-gray-300 hover:text-white transition-colors duration-300">
+                  Security
+                </a>
               </li>
               <li>
                 <a href="#" className="text-gray-300 hover:text-white transition-colors duration-300">

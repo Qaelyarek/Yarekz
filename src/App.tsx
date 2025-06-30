@@ -14,7 +14,6 @@ import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
-import CookiePolicyPage from './pages/CookiePolicyPage';
 import DisclaimerPage from './pages/DisclaimerPage';
 import { validateRequiredEnvVars, isDevelopment } from './config/environment';
 
@@ -54,7 +53,6 @@ function App() {
               {/* Legal Pages */}
               <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
               <Route path="/terms-of-service" element={<TermsOfServicePage />} />
-              <Route path="/cookie-policy" element={<CookiePolicyPage />} />
               <Route path="/disclaimer" element={<DisclaimerPage />} />
             </Routes>
           </main>
