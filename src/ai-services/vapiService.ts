@@ -1,12 +1,10 @@
-import Vapi from '@vapi-ai/web';
+import Vapi from '@vapi-ai/web'; // ⬅️ Default import, not destructured
 
-// ✅ Initialize VAPI client (v2 style)
+// ✅ Instantiate using `new Vapi()` with config object
 const vapi = new Vapi({ apiKey: import.meta.env.VITE_VAPI_PUBLIC_KEY });
 
-// ✅ Type definition for supported agents
 type AgentType = 'max' | 'grace' | 'kyle' | 'squad';
 
-// ✅ Agent configuration mapping
 const agentMap: Record<AgentType, string> = {
   max: import.meta.env.VITE_AGENT_MAX,
   grace: import.meta.env.VITE_AGENT_GRACE,
@@ -14,16 +12,19 @@ const agentMap: Record<AgentType, string> = {
   squad: import.meta.env.VITE_AGENT_SQUAD,
 };
 
-// ✅ Configure agent selection functionality
 function setAssistant(agent: AgentType): void {
   const agentId = agentMap[agent];
   if (!agentId) {
-    throw new Error(`Invalid agent name: ${agent}. Available agents: ${Object.keys(agentMap).join(', ')}`);
+    throw new Error(
+      `Invalid agent name: ${agent}. Available agents: ${Object.keys(agentMap).join(', ')}`
+    );
   }
 
-  vapi.set({ agentId }); // Correct method for v2
+  // ✅ Correct method is `start`, not `set`
+  vapi.start({
+    assistantId: agentId,
+  });
 }
 
-// ✅ Export the vapi instance and helper functions
 export { vapi, setAssistant };
 export type { AgentType };
