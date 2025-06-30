@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import { DollarSign, TrendingUp, Target, Star } from 'lucide-react';
+import { DollarSign, TrendingUp, Target, Star, Clock, Shield, Users } from 'lucide-react';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import VAPIDemo from './components/VAPIDemo';
@@ -302,6 +302,52 @@ const MinimalistCEOFunnel: React.FC = () => {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* CTA Section with Enhanced Professional Call Interface */}
+      <section className="bg-white text-black py-20 lg:py-32 border-t-4 border-black relative">
+        <div className="max-w-6xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl md:text-5xl font-bold mb-6">
+            Ready to 10X Your Appointments?
+          </h2>
+          <div className="w-32 h-1 bg-black mx-auto mb-8"></div>
+          <p className="text-xl text-gray-600 mb-12 leading-relaxed">
+            Join 500+ CEOs who've automated their appointment setting with AI.
+          </p>
+          
+          {/* Enhanced Professional Call Interface with Proper Termination */}
+          <div className="mb-12">
+            <ProfessionalCallInterface
+              isActive={callState.inCall}
+              isConnecting={callState.isConnecting}
+              onAccept={handleCallAccept}
+              onEnd={handleCallEnd}
+              className="mx-auto"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            {[
+              { icon: Clock, title: "30-Day Results", desc: "Or money back" },
+              { icon: Shield, title: "No Contract", desc: "Cancel anytime" },
+              { icon: Users, title: "Limited Spots", desc: "50 CEOs per month" }
+            ].map((item, index) => (
+              <div key={index} className="flex flex-col items-center">
+                <item.icon className="w-8 h-8 mb-2" />
+                <div className="font-semibold">{item.title}</div>
+                <div className="text-gray-600 text-sm">{item.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Enhanced Call Termination Button - Only visible during active calls */}
+        <CallTerminationButton
+          visible={callState.inCall}
+          onEndCall={handleCallEnd}
+          showToast={true}
+          position="center-bottom"
+        />
       </section>
     </div>
   );
