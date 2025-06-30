@@ -77,23 +77,23 @@ const AIPhoneInterface: React.FC<AIPhoneInterfaceProps> = ({
     };
 
     // Set up event listeners - cast to any to avoid TypeScript errors
-    vapi.on('callStarted' as any, handleCallStarted);
-    vapi.on('callEnded' as any, handleCallEnded);
-    vapi.on('call-start' as any, handleCallStarted); // Fallback for different event names
-    vapi.on('call-end' as any, handleCallEnded);
-    vapi.on('speech-start' as any, handleSpeechStart);
-    vapi.on('speech-end' as any, handleSpeechEnd);
-    vapi.on('error' as any, handleError);
+    (vapi as any).on('callStarted', handleCallStarted);
+    (vapi as any).on('callEnded', handleCallEnded);
+    (vapi as any).on('call-start', handleCallStarted); // Fallback for different event names
+    (vapi as any).on('call-end', handleCallEnded);
+    (vapi as any).on('speech-start', handleSpeechStart);
+    (vapi as any).on('speech-end', handleSpeechEnd);
+    (vapi as any).on('error', handleError);
 
     return () => {
-      // Clean up event listeners
-      vapi.off('callStarted' as any, handleCallStarted);
-      vapi.off('callEnded' as any, handleCallEnded);
-      vapi.off('call-start' as any, handleCallStarted);
-      vapi.off('call-end' as any, handleCallEnded);
-      vapi.off('speech-start' as any, handleSpeechStart);
-      vapi.off('speech-end' as any, handleSpeechEnd);
-      vapi.off('error' as any, handleError);
+      // Clean up event listeners - cast to any to avoid TypeScript errors
+      (vapi as any).off('callStarted', handleCallStarted);
+      (vapi as any).off('callEnded', handleCallEnded);
+      (vapi as any).off('call-start', handleCallStarted);
+      (vapi as any).off('call-end', handleCallEnded);
+      (vapi as any).off('speech-start', handleSpeechStart);
+      (vapi as any).off('speech-end', handleSpeechEnd);
+      (vapi as any).off('error', handleError);
     };
   }, [onCallStart, onCallEnd]);
 
@@ -101,7 +101,7 @@ const AIPhoneInterface: React.FC<AIPhoneInterfaceProps> = ({
     if (isCalling) {
       // End call
       try {
-        await vapi.stop();
+        await (vapi as any).stop();
         console.log('📞 Call ended successfully');
       } catch (error) {
         console.error('Failed to end call:', error);
@@ -129,11 +129,11 @@ const AIPhoneInterface: React.FC<AIPhoneInterfaceProps> = ({
   const toggleMute = () => {
     try {
       if (isMuted) {
-        vapi.unmute();
+        (vapi as any).unmute();
         setIsMuted(false);
         console.log('🔊 Unmuted');
       } else {
-        vapi.mute();
+        (vapi as any).mute();
         setIsMuted(true);
         console.log('🔇 Muted');
       }
